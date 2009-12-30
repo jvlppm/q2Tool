@@ -1,6 +1,6 @@
 ﻿namespace q2Tool.Commands.Server
 {
-	public class CenterPrint : IServerCommand, IStringPackage
+	public class CenterPrint : IServerCommand, IServerStringPackage
 	{
 		public string Message { get; set; }
 

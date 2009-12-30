@@ -58,7 +58,7 @@
     <Compile Include="Game\Commands\ICommand.cs" />
     <Compile Include="Game\Commands\Server\CenterPrint.cs" />
     <Compile Include="Game\Commands\Server\ConfigString.cs" />
-    <Compile Include="Game\Commands\Server\ConfigString\ConfigStringPlayerInfo.cs" />
+    <Compile Include="Game\Commands\Server\ConfigString\PlayerInfo.cs" />
     <Compile Include="Game\Commands\Server\Frame.cs" />
     <Compile Include="Game\Commands\Server\Print.cs" />
     <Compile Include="Game\Commands\Server\ServerData.cs" />

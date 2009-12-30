@@ -1,6 +1,6 @@
 namespace q2Tool.Commands.Server
 {
-	public class Print : IServerCommand, IStringPackage
+	public class Print : IServerCommand, IServerStringPackage
 	{
 		public enum PrintLevel : byte
 		{

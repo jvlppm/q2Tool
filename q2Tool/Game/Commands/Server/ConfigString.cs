@@ -1,7 +1,7 @@
 using System;
 namespace q2Tool.Commands.Server
 {
-	public enum ConfigType : short
+	public enum ConfigStringType : short
 	{
 		Name = 0,
 		CdTrack = 1,
@@ -24,10 +24,10 @@ namespace q2Tool.Commands.Server
 		Bad = General + Quake.MaxGeneral
 	}
 
-	public class ConfigString : IServerCommand, IStringPackage
+	public class ConfigString : IServerCommand, IServerStringPackage
 	{
-		ConfigType _configType;
-		public ConfigType ConfigType
+		ConfigStringType _configType;
+		public ConfigStringType ConfigType
 		{
 			get
 			{
@@ -35,10 +35,10 @@ namespace q2Tool.Commands.Server
 			}
 			set
 			{
-				var configTypes = Enum.GetValues(typeof (ConfigType));
+				var configTypes = Enum.GetValues(typeof (ConfigStringType));
 				for (int i = configTypes.Length - 1; i >= 0; i-- )
 				{
-					ConfigType current = (ConfigType) configTypes.GetValue(i);
+					ConfigStringType current = (ConfigStringType) configTypes.GetValue(i);
 					if (value >= current)
 					{
 						_configType = current;
@@ -54,19 +54,19 @@ namespace q2Tool.Commands.Server
 		//[short configType][string message]
 		public ConfigString(RawPackage data)
 		{
-			ConfigType = (ConfigType)data.ReadShort();
+			ConfigType = (ConfigStringType)data.ReadShort();
 			Message = data.ReadString();
 			if(Message == string.Empty)
-				ConfigType = ConfigType.Bad;
+				ConfigType = ConfigStringType.Bad;
 		}
 
-		public ConfigString(ConfigType type, string message)
+		public ConfigString(ConfigStringType type, string message)
 		{
 			ConfigType = type;
 			Message = message;
 		}
 
-		public ConfigString(ConfigType type, int subCode, string message)
+		public ConfigString(ConfigStringType type, int subCode, string message)
 		{
 			ConfigType = type;
 			SubCode = subCode;
@@ -76,14 +76,14 @@ namespace q2Tool.Commands.Server
 		#region ICommand
 		public int Size()
 		{
-			if (_configType == ConfigType.Bad)
+			if (_configType == ConfigStringType.Bad)
 				return 0;
 			return Message.Length + 4;
 		}
 
 		public void WriteTo(RawPackage data)
 		{
-			if (_configType == ConfigType.Bad)
+			if (_configType == ConfigStringType.Bad)
 				return;
 
 			data.WriteByte((byte)Type);
