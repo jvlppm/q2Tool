@@ -7,6 +7,9 @@ namespace q2Tool
 		string Message { get; }
 	}
 
+	public interface IClientStringPackage : IClientCommand, IStringPackage { }
+	public interface IServerStringPackage : IServerCommand, IStringPackage { }
+
 	public class StringPackage : IStringPackage
 	{
 		public string Message { get; set; }

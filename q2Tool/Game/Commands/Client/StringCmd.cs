@@ -1,6 +1,6 @@
 namespace q2Tool.Commands.Client
 {
-	public class StringCmd : StringPackage, IClientCommand
+	public class StringCmd : StringPackage, IClientStringPackage
 	{
 		//[string message]
 		public StringCmd(RawPackage data) : base((byte)ClientCommand.StringCmd, data) { }

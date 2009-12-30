@@ -41,12 +41,12 @@ namespace q2Tool
 				Name = name;
 
 			#region CreateProxy
-			FakeServerCommands = new Queue<IServerCommand>();
-			FakeClientCommands = new Queue<IClientCommand>();
+			_fakeServerCommands = new Queue<IServerCommand>();
+			_fakeClientCommands = new Queue<IClientCommand>();
 
-			Proxy = new UdpProxy();
-			Proxy.OnDestinationMessage += ParseServerData;
-			Proxy.OnSourceMessage += ParseClientData;
+			_proxy = new UdpProxy();
+			_proxy.OnDestinationMessage += ParseServerData;
+			_proxy.OnSourceMessage += ParseClientData;
 			#endregion
 		}
 

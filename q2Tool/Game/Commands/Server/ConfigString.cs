@@ -60,6 +60,19 @@ namespace q2Tool.Commands.Server
 				ConfigType = ConfigType.Bad;
 		}
 
+		public ConfigString(ConfigType type, string message)
+		{
+			ConfigType = type;
+			Message = message;
+		}
+
+		public ConfigString(ConfigType type, int subCode, string message)
+		{
+			ConfigType = type;
+			SubCode = subCode;
+			Message = message;
+		}
+
 		#region ICommand
 		public int Size()
 		{

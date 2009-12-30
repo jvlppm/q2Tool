@@ -1,6 +1,6 @@
 ﻿namespace q2Tool.Commands.Client
 {
-	public class UserInfo : StringPackage, IClientCommand
+	public class UserInfo : StringPackage, IClientStringPackage
 	{
 		//[string message]
 		public UserInfo(RawPackage data) : base((byte)ClientCommand.UserInfo, data) { }

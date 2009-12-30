@@ -8,21 +8,21 @@ namespace q2Tool
 {
 	public partial class Quake
 	{
-		public UdpProxy Proxy { get; private set; }
+		readonly UdpProxy _proxy;
 		int _lastReceivedMessageId, _lastSentMessageId;
 
-		readonly Queue<IServerCommand> FakeServerCommands;
-		readonly Queue<IClientCommand> FakeClientCommands;
+		readonly Queue<IServerCommand> _fakeServerCommands;
+		readonly Queue<IClientCommand> _fakeClientCommands;
 
 		void StartProxy(int localPort, string serverIp, int serverPort)
 		{
-			Proxy.ForwardLocalConnections(localPort, new ConnectionPoint(serverIp, serverPort, true));
+			_proxy.ForwardLocalConnections(localPort, new ConnectionPoint(serverIp, serverPort, true));
 		}
 
 		#region Events Definitions
 		#region Server
 		public event ConnectionPackageEventHandler OnServerPackage;
-		public event CommandEventHandler<IStringPackage> OnServerStringPackage;
+		public event ServerCommandEventHandler<IServerStringPackage> OnServerStringPackage;
 		public event ServerCommandEventHandler<ServerData> OnServerData;
 		public event ServerCommandEventHandler<CenterPrint> OnCenterPrint;
 		public event ServerCommandEventHandler<Print> OnPrint;
@@ -31,7 +31,7 @@ namespace q2Tool
 		#endregion
 		#region Client
 		public event ConnectionPackageEventHandler OnClientPackage;
-		public event CommandEventHandler<IStringPackage> OnClientStringPackage;
+		public event ClientCommandEventHandler<IClientStringPackage> OnClientStringPackage;
 		public event ClientCommandEventHandler<StringCmd> OnStringCmd;
 		public event ClientCommandEventHandler<UserInfo> OnUserInfo;
 		#endregion
@@ -49,10 +49,10 @@ namespace q2Tool
 
 			OnClientPackage.Fire(this, package);
 
-			lock(FakeClientCommands)
+			lock(_fakeClientCommands)
 			{
-				while(FakeClientCommands.Count > 0)
-					package.Commands.Enqueue(FakeClientCommands.Dequeue());
+				while (_fakeClientCommands.Count > 0)
+					package.Commands.Enqueue(_fakeClientCommands.Dequeue());
 			}
 
 			foreach(IClientCommand cmd in package.Commands)
@@ -61,11 +61,11 @@ namespace q2Tool
 				{
 					case ClientCommand.StringCmd:
 						OnStringCmd.Fire(this, (StringCmd)cmd);
-						OnClientStringPackage.Fire(this, (IStringPackage) cmd);
+						OnClientStringPackage.Fire(this, (IClientStringPackage) cmd);
 						break;
 					case ClientCommand.UserInfo:
 						OnUserInfo.Fire(this, (UserInfo)cmd);
-						OnClientStringPackage.Fire(this, (IStringPackage)cmd);
+						OnClientStringPackage.Fire(this, (IClientStringPackage)cmd);
 						break;
 				}
 			}
@@ -84,10 +84,10 @@ namespace q2Tool
 
 			OnServerPackage.Fire(this, package);
 
-			lock (FakeServerCommands)
+			lock (_fakeServerCommands)
 			{
-				while(FakeServerCommands.Count > 0)
-					package.Commands.Enqueue(FakeServerCommands.Dequeue());
+				while (_fakeServerCommands.Count > 0)
+					package.Commands.Enqueue(_fakeServerCommands.Dequeue());
 			}
 
 			foreach (IServerCommand cmd in package.Commands)
@@ -100,22 +100,22 @@ namespace q2Tool
 
 					case ServerCommand.CenterPrint:
 						OnCenterPrint.Fire(this, (CenterPrint)cmd);
-						OnServerStringPackage.Fire(this, (IStringPackage)cmd);
+						OnServerStringPackage.Fire(this, (IServerStringPackage)cmd);
 						break;
 
 					case ServerCommand.Print:
 						OnPrint.Fire(this, (Print)cmd);
-						OnServerStringPackage.Fire(this, (IStringPackage)cmd);
+						OnServerStringPackage.Fire(this, (IServerStringPackage)cmd);
 						break;
 
 					case ServerCommand.StuffText:
 						OnStuffText.Fire(this, (StuffText)cmd);
-						OnServerStringPackage.Fire(this, (IStringPackage)cmd);
+						OnServerStringPackage.Fire(this, (IServerStringPackage)cmd);
 						break;
 
 					case ServerCommand.ConfigString:
 						OnConfigString.Fire(this, (ConfigString)cmd);
-						OnServerStringPackage.Fire(this, (IStringPackage)cmd);
+						OnServerStringPackage.Fire(this, (IServerStringPackage)cmd);
 						break;
 				}
 			}
@@ -128,32 +128,32 @@ namespace q2Tool
 		#region Public
 		public void SendToServer(IClientCommand command)
 		{
-			lock (FakeClientCommands)
-				FakeClientCommands.Enqueue(command);
+			lock (_fakeClientCommands)
+				_fakeClientCommands.Enqueue(command);
 		}
 
 		public void SendCommand(string message)
 		{
-			lock (FakeClientCommands)
-				FakeClientCommands.Enqueue(new StringCmd(message));
+			lock (_fakeClientCommands)
+				_fakeClientCommands.Enqueue(new StringCmd(message));
 		}
 
 		public void SendToClient(IServerCommand command)
 		{
-			lock(FakeServerCommands)
-				FakeServerCommands.Enqueue(command);
+			lock (_fakeServerCommands)
+				_fakeServerCommands.Enqueue(command);
 		}
 
 		public void ExecuteCommand(string command, params object[] args)
 		{
-			lock (FakeServerCommands)
-				FakeServerCommands.Enqueue(new StuffText(string.Format(command + "\n", args)));
+			lock (_fakeServerCommands)
+				_fakeServerCommands.Enqueue(new StuffText(string.Format(command + "\n", args)));
 		}
 
 		public void ReceiveChat(string command, params object[] args)
 		{
-			lock (FakeServerCommands)
-				FakeServerCommands.Enqueue(new Print(Print.PrintLevel.Chat, string.Format(command, args)));
+			lock (_fakeServerCommands)
+				_fakeServerCommands.Enqueue(new Print(Print.PrintLevel.Chat, string.Format(command, args)));
 		}
 		#endregion
 	}

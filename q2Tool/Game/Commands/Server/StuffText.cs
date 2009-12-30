@@ -1,6 +1,6 @@
 namespace q2Tool.Commands.Server
 {
-	public class StuffText : StringPackage, IServerCommand
+	public class StuffText : StringPackage, IServerStringPackage
 	{
 		//[string message]
 		public StuffText(RawPackage data) : base((byte)ServerCommand.StuffText, data) { }
