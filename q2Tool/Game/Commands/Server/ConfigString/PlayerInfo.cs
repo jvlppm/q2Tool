@@ -1,56 +1,34 @@
 ﻿namespace q2Tool.Commands.Server
 {
-	public class PlayerInfo : IServerCommand, IStringPackage
+	public class PlayerInfo : ConfigString
 	{
-		public int Id { get; set; }
-		public string Name { get; set; }
-		public string Model { get; set; }
-		public string Skin { get; set; }
-
-		public PlayerInfo(ConfigString configString)
-		{
-			string[] words = configString.Message.Split('\\');
-			string[] look = words[1].Split('/');
-			Name = words[0];
-			Model = look[0];
-			Skin = look[1];
-			Id = configString.SubCode;
-		}
+		public PlayerInfo(int playerId, RawServerPackage data) : base(ConfigStringType.PlayerInfo, playerId, data) { }
 
 		public PlayerInfo(int playerId, string name, string model, string skin)
+			: base(ConfigStringType.PlayerInfo, playerId, string.Format("{0}\\{1}/{2}", name, model, skin)) { }
+
+		public int Id
 		{
-			Id = playerId;
-			Name = name;
-			Model = model;
-			Skin = skin;
+			get { return SubCode; }
+			set { SubCode = value; }
 		}
 
-		#region ICommand
-		public int Size()
+		public string Name
 		{
-			if (string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Model) || string.IsNullOrEmpty(Skin))
-				return 0;
-
-			return Name.Length + Model.Length + Skin.Length + 6;
+			get { return Message.Split('\\')[0]; }
+			set { Message = value + "\\" + Model + "/" + Skin; }
 		}
 
-		public void WriteTo(RawPackage data)
+		public string Model
 		{
-			if (string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Model) || string.IsNullOrEmpty(Skin))
-				return;
-
-			data.WriteByte((byte)Type);
-			data.WriteShort((short)((short)ConfigStringType.PlayerInfo + Id));
-			data.WriteString(Message);
+			get { return Message.Split('\\')[1].Split('/')[0]; }
+			set { Message = Name + "\\" + value + "/" + Skin; }
 		}
 
-		public string Message
+		public string Skin
 		{
-			get { return string.Format("{0}\\{1}/{2}", Name, Model, Skin); }
+			get { return Message.Split('/')[1]; }
+			set { Message = Name + "\\" + Model + "/" + value; }
 		}
-
-		public ServerCommand Type { get { return ServerCommand.ConfigString; } }
-
-		#endregion
 	}
 }

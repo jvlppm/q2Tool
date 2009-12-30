@@ -2,6 +2,7 @@
 using q2Tool.Commands;
 using q2Tool.Commands.Client;
 using q2Tool.Commands.Server;
+using System;
 
 namespace q2Tool
 {
@@ -67,10 +68,6 @@ namespace q2Tool
 					case ServerCommand.ServerData:
 						nPackage.Commands.Enqueue(new ServerData(data));
 						break;
-						
-					case ServerCommand.ConfigString:
-						nPackage.Commands.Enqueue(new ConfigString(data));
-						break;
 
 					/*case ServerCommand.Frame:
 						nPackage.Commands.Add(new Frame(data, extrabits));
@@ -86,6 +83,51 @@ namespace q2Tool
 
 					case ServerCommand.StuffText:
 						nPackage.Commands.Enqueue(new StuffText(data));
+						break;
+
+					case ServerCommand.ConfigString:
+						var configStringType = (ConfigStringType)data.ReadShort();
+						int configStringSubCode = 0;
+
+						var configTypes = Enum.GetValues(typeof(ConfigStringType));
+						for (int i = configTypes.Length - 1; i >= 0; i--)
+						{
+							ConfigStringType current = (ConfigStringType)configTypes.GetValue(i);
+							if (configStringType >= current)
+							{
+								configStringSubCode = configStringType - current;
+								configStringType = current;
+								break;
+							}
+						}
+
+						switch (configStringType)
+						{
+							case ConfigStringType.PlayerInfo:
+								nPackage.Commands.Enqueue(new PlayerInfo(configStringSubCode, data));
+								break;
+
+							case ConfigStringType.Name:
+							case ConfigStringType.CdTrack:
+							case ConfigStringType.Sky:
+							case ConfigStringType.SkyAxis:
+							case ConfigStringType.SkyRotate:
+							case ConfigStringType.StatusBar:
+
+							case ConfigStringType.AirAccel:
+							case ConfigStringType.MaxClients:
+							case ConfigStringType.MapChecksum:
+
+							case ConfigStringType.Models:
+							case ConfigStringType.Sounds:
+							case ConfigStringType.Images:
+							case ConfigStringType.Lights:
+							case ConfigStringType.Items:
+							case ConfigStringType.General:
+							case ConfigStringType.Bad:
+								nPackage.Commands.Enqueue(new ConfigString(configStringType, configStringSubCode, data));
+								break;
+						}
 						break;
 
 					default:

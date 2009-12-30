@@ -28,6 +28,7 @@ namespace q2Tool
 		public event ServerCommandEventHandler<Print> OnPrint;
 		public event ServerCommandEventHandler<StuffText> OnStuffText;
 		public event ServerCommandEventHandler<ConfigString> OnConfigString;
+		public event ServerCommandEventHandler<PlayerInfo> OnPlayerInfo;
 		#endregion
 		#region Client
 		public event ConnectionPackageEventHandler OnClientPackage;
@@ -114,8 +115,19 @@ namespace q2Tool
 						break;
 
 					case ServerCommand.ConfigString:
-						OnConfigString.Fire(this, (ConfigString)cmd);
-						OnServerStringPackage.Fire(this, (IServerStringPackage)cmd);
+						switch (((ConfigString)cmd).ConfigType)
+						{
+							case ConfigStringType.PlayerInfo:
+								OnPlayerInfo.Fire(this, (PlayerInfo)cmd);
+								OnConfigString.Fire(this, (PlayerInfo)cmd);
+								OnServerStringPackage.Fire(this, (PlayerInfo)cmd);
+								break;
+
+							default:
+								OnConfigString.Fire(this, (ConfigString)cmd);
+								OnServerStringPackage.Fire(this, (ConfigString)cmd);
+								break;
+						}
 						break;
 				}
 			}

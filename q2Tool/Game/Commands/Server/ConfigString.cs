@@ -52,10 +52,12 @@ namespace q2Tool.Commands.Server
 		public string Message { get; set; }
 
 		//[short configType][string message]
-		public ConfigString(RawPackage data)
+		public ConfigString(ConfigStringType configType, int subCode, RawPackage data)
 		{
-			ConfigType = (ConfigStringType)data.ReadShort();
+			ConfigType = configType;
+			SubCode = subCode;
 			Message = data.ReadString();
+
 			if(Message == string.Empty)
 				ConfigType = ConfigStringType.Bad;
 		}
