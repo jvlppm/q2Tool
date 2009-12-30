@@ -1,8 +1,4 @@
 ﻿using System;
-using System.IO;
-using Update;
-using System.Linq;
-using System.Diagnostics;
 using Jv.Plugins;
 
 namespace q2Tool
@@ -11,9 +7,45 @@ namespace q2Tool
 	{
 		static readonly Manager PluginManager = new Manager();
 
-		static void Main()
+		static void Main(string[] args)
 		{
-			#region Carrega Plugins
+			try
+			{
+				LoadPlugins();
+
+				var quake = new Quake(Settings.ReadValue("Game", "Path"))
+				{
+					CFG = Settings.ReadValue("Game", "CFG")
+				};
+
+				string server = Settings.ReadValue("Game", "DefaultServer");
+
+				for (int i = 0; i < args.Length; i++)
+				{
+					if (args[i] == "+connect")
+					{
+						server = args[++i];
+						break;
+					}
+				}
+
+				quake.Run(server);
+
+				foreach (Plugin plugin in PluginManager.GetPlugins<Plugin>())
+				{
+					plugin.Quake = quake;
+					plugin.OnGameStart();
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine("Error: {0}", ex.Message);
+				PluginManager.MessageToPlugin<PLog>(ex);
+			}
+		}
+
+		private static void LoadPlugins()
+		{
 			foreach (string dll in System.IO.Directory.GetFiles(".", "q2Tool.Plugin.*.dll"))
 			{
 				string fileName = dll.Replace('\\', '/').Replace("./", "");
@@ -34,7 +66,6 @@ namespace q2Tool
 				catch (Jv.Plugins.Exceptions.CouldNotInstantiate) { throw; }
 				catch (Jv.Plugins.Exceptions.CouldNotLoad) { }
 			}
-			#endregion
 		}
 	}
 }

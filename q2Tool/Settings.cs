@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Update
+namespace q2Tool
 {
 	public static class Settings
 	{
