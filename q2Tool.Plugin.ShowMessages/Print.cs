@@ -5,6 +5,14 @@ namespace q2Tool
 	public partial class ShowMessages
 	{
 		#region Show Colored Messages
+		static void ShowLine(ConsoleColor color, string text)
+		{
+			if (text.EndsWith("\n") || text.Length % Console.WindowWidth == 0)
+				Show(color, text);
+			else
+				Show(color, text + "\n");
+		}
+
 		static void ShowLine(ConsoleColor color, string format, params object[] args)
 		{
 			string text = string.Format(format, args);
