@@ -61,6 +61,13 @@
             <typeparam name="PluginType">Tipo da Base do plugin carregado.</typeparam>
             <param name="message">Mensagem a ser recebida pelos plugins.</param>
         </member>
+        <member name="M:Jv.Plugins.Manager.MessageToPlugin``1(System.String)">
+            <summary>
+            Envia mensagem para os plugins de tipo PluginType.
+            </summary>
+            <typeparam name="PluginType">Tipo da Base do plugin carregado.</typeparam>
+            <param name="message">Mensagem a ser recebida pelos plugins.</param>
+        </member>
         <member name="M:Jv.Plugins.Manager.MessageToPlugin``1(System.String,System.Object[])">
             <summary>
             Envia mensagem para os plugins de tipo PluginType.
@@ -195,6 +202,13 @@
             <typeparam name="PluginType">Tipo da Base dos plugins carregados.</typeparam>
         </member>
         <member name="M:Jv.Plugins.Plugin.MessageToPlugin``1(System.Object)">
+            <summary>
+            Envia mensagem para os plugins de tipo PluginType.
+            </summary>
+            <typeparam name="PluginType">Tipo da Base do plugin carregado.</typeparam>
+            <param name="message">Mensagem a ser recebida pelos plugins.</param>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.MessageToPlugin``1(System.String)">
             <summary>
             Envia mensagem para os plugins de tipo PluginType.
             </summary>

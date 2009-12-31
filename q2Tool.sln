@@ -9,6 +9,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{86B2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "q2Tool.Plugin.FakeVideoSettings", "q2Tool.Plugin.FakeVideoSettings\q2Tool.Plugin.FakeVideoSettings.csproj", "{E7F5785E-2378-4E89-A6F9-58E7C85208FB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "q2Tool.Plugin.Test", "q2Tool.Plugin.Test\q2Tool.Plugin.Test.csproj", "{E7A81F97-6856-464C-9F79-EA928A45B5A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "q2Tool.Plugin.ShowPlayer", "q2Tool.Plugin.ShowPlayer\q2Tool.Plugin.ShowPlayer.csproj", "{8123F0DB-5C93-48D5-B46F-D8EFFAA831A5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "q2Tool.Plugin.SpeedJump", "q2Tool.Plugin.SpeedJump\q2Tool.Plugin.SpeedJump.csproj", "{1D5292F4-F906-4934-A3EF-FE4EF12BFCE1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +33,18 @@ Global
 		{E7F5785E-2378-4E89-A6F9-58E7C85208FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7F5785E-2378-4E89-A6F9-58E7C85208FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7F5785E-2378-4E89-A6F9-58E7C85208FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7A81F97-6856-464C-9F79-EA928A45B5A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7A81F97-6856-464C-9F79-EA928A45B5A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7A81F97-6856-464C-9F79-EA928A45B5A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7A81F97-6856-464C-9F79-EA928A45B5A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8123F0DB-5C93-48D5-B46F-D8EFFAA831A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8123F0DB-5C93-48D5-B46F-D8EFFAA831A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8123F0DB-5C93-48D5-B46F-D8EFFAA831A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8123F0DB-5C93-48D5-B46F-D8EFFAA831A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D5292F4-F906-4934-A3EF-FE4EF12BFCE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D5292F4-F906-4934-A3EF-FE4EF12BFCE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D5292F4-F906-4934-A3EF-FE4EF12BFCE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D5292F4-F906-4934-A3EF-FE4EF12BFCE1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -34,5 +52,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{C0DD5574-2C74-4BB0-ACA3-C6BFAB420B73} = {86B2FE31-E644-4033-9C4C-E1C4A75049CC}
 		{E7F5785E-2378-4E89-A6F9-58E7C85208FB} = {86B2FE31-E644-4033-9C4C-E1C4A75049CC}
+		{E7A81F97-6856-464C-9F79-EA928A45B5A9} = {86B2FE31-E644-4033-9C4C-E1C4A75049CC}
+		{8123F0DB-5C93-48D5-B46F-D8EFFAA831A5} = {86B2FE31-E644-4033-9C4C-E1C4A75049CC}
+		{1D5292F4-F906-4934-A3EF-FE4EF12BFCE1} = {86B2FE31-E644-4033-9C4C-E1C4A75049CC}
 	EndGlobalSection
 EndGlobal

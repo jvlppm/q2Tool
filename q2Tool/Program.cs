@@ -1,5 +1,8 @@
 ﻿using System;
 using Jv.Plugins;
+using System.Linq;
+using Update;
+using System.Diagnostics;
 
 namespace q2Tool
 {
@@ -11,6 +14,54 @@ namespace q2Tool
 		{
 			try
 			{
+				if(!args.ToList().Contains("--disable-updates"))
+				{
+					Console.Write("Checking updates...");
+					var updater = new Updater(Settings.ReadValue("Update", "UpdateUrl"));
+
+					foreach(var module in updater.Modules)
+					{
+						if (module.Name.StartsWith("q2Tool.Plugin."))
+						{
+							module.Enabled = false;
+							if (module.Enabled && Settings.ReadValue("q2Tool.Plugin", module.Name.Substring(14)) == string.Empty)
+								Settings.WriteValue("q2Tool.Plugin", module.Name.Substring(14), "enabled");
+						}
+					}
+
+					if (updater.GetUpdateFileList().Count > 0)
+					{
+						Console.WriteLine("Update required!");
+						updater = new Updater(Settings.ReadValue("Update", "UpdaterUrl"));
+						foreach (var file in updater.GetUpdateFileList())
+							updater.DownloadFile(file);
+
+						Settings.WriteValue("Update", "WaitProcess", "q2Tool");
+						Settings.WriteValue("Update", "AutoExecute", "q2Tool.exe --disable-updates");
+						Process.Start("Update.exe");
+						return;
+					}
+					else
+					{
+						foreach (var module in updater.Modules)
+						{
+							if (module.Name.StartsWith("q2Tool.Plugin."))
+								module.Enabled = Settings.ReadValue("q2Tool.Plugin", module.Name.Substring(14)).ToLower() == "enabled";
+							else
+								module.Enabled = false;
+						}
+						var pluginFiles = updater.GetUpdateFileList();
+						if (pluginFiles.Count > 0)
+						{
+							Console.Write("Downloading plugins...");
+							foreach (var plugin in pluginFiles)
+								updater.DownloadFile(plugin);
+						}
+
+						Console.WriteLine("OK");
+					}
+				}
+
 				LoadPlugins();
 
 				var quake = new Quake(Settings.ReadValue("Game", "Path"))
@@ -52,14 +103,14 @@ namespace q2Tool
 				try
 				{
 					string pluginName = fileName.Substring(14, fileName.LastIndexOf('.') - 14);
-					string pluginStatus = Settings.ReadValue("q2Tool.Plugins", pluginName);
+					string pluginStatus = Settings.ReadValue("q2Tool.Plugin", pluginName);
 
 					if (!string.IsNullOrEmpty(pluginStatus) && pluginStatus.ToLower() != "enabled")
 					{
-						Settings.WriteValue("q2Tool.Plugins", pluginName, "disabled");
+						Settings.WriteValue("q2Tool.Plugin", pluginName, "disabled");
 						continue;
 					}
-					Settings.WriteValue("q2Tool.Plugins", pluginName, "enabled");
+					Settings.WriteValue("q2Tool.Plugin", pluginName, "enabled");
 
 					PluginManager.LoadPlugin<Plugin>(fileName);
 				}
