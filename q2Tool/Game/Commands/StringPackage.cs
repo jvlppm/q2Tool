@@ -4,7 +4,7 @@ namespace q2Tool
 {
 	public interface IStringPackage : ICommand
 	{
-		string Message { get; }
+		string Message { get; set; }
 	}
 
 	public interface IClientStringPackage : IClientCommand, IStringPackage { }
