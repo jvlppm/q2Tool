@@ -36,7 +36,7 @@ namespace q2Tool
 			Path = path.Replace("\\", "/");
 
 			if (name == string.Empty)
-				Name = Path.Substring(Path.LastIndexOf('/'), Path.Length - 3 - Path.LastIndexOf('/'));
+				Name = Path.Substring(Path.LastIndexOf('/') + 1, Path.Length - 5 - Path.LastIndexOf('/'));
 			else
 				Name = name;
 
