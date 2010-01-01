@@ -16,48 +16,32 @@ namespace q2Tool
 			{
 				if(!args.ToList().Contains("--disable-updates"))
 				{
-					Console.Write("Checking updates...");
 					var updater = new Updater(Settings.ReadValue("Update", "UpdateUrl"));
 
-					foreach(var module in updater.Modules)
-					{
-						if (module.Name.StartsWith("q2Tool.Plugin."))
-						{
-							module.Enabled = false;
-							if (module.Enabled && Settings.ReadValue("q2Tool.Plugin", module.Name.Substring(14)) == string.Empty)
-								Settings.WriteValue("q2Tool.Plugin", module.Name.Substring(14), "enabled");
-						}
-					}
-
-					if (updater.GetUpdateFileList().Count > 0)
+					Console.Write("Checking updates...");
+					if (MainUpdateRequired(updater))
 					{
 						Console.WriteLine("Update required!");
 						updater = new Updater(Settings.ReadValue("Update", "UpdaterUrl"));
 						foreach (var file in updater.GetUpdateFileList())
 							updater.DownloadFile(file);
 
-						Settings.WriteValue("Update", "WaitProcess", "q2Tool");
-						Settings.WriteValue("Update", "AutoExecute", "q2Tool.exe --disable-updates");
-						Process.Start("Update.exe");
+						Process.Start("Update.exe", "--wait-process q2Tool --auto-execute \"q2Tool.exe --disable-updates\"");
 						return;
 					}
 					else
 					{
-						foreach (var module in updater.Modules)
-						{
-							if (module.Name.StartsWith("q2Tool.Plugin."))
-								module.Enabled = Settings.ReadValue("q2Tool.Plugin", module.Name.Substring(14)).ToLower() == "enabled";
-							else
-								module.Enabled = false;
-						}
+						EnableOnlyPlugins(updater);
 						var pluginFiles = updater.GetUpdateFileList();
 						if (pluginFiles.Count > 0)
 						{
-							Console.Write("Downloading plugins...");
+							Console.Write("Downloading plugins..");
 							foreach (var plugin in pluginFiles)
+							{
+								Console.Write(".");
 								updater.DownloadFile(plugin);
+							}
 						}
-
 						Console.WriteLine("OK");
 					}
 				}
@@ -93,6 +77,32 @@ namespace q2Tool
 				Console.WriteLine("Error: {0}", ex.Message);
 				PluginManager.MessageToPlugin<PLog>(ex);
 			}
+		}
+
+		private static void EnableOnlyPlugins(Updater updater)
+		{
+			foreach (var module in updater.Modules)
+			{
+				if (module.Name.StartsWith("q2Tool.Plugin."))
+					module.Enabled = Settings.ReadValue("q2Tool.Plugin", module.Name.Substring(14)).ToLower() == "enabled";
+				else
+					module.Enabled = false;
+			}
+		}
+
+		static bool MainUpdateRequired(Updater updater)
+		{
+			foreach (var module in updater.Modules)
+			{
+				if (module.Name.StartsWith("q2Tool.Plugin."))
+				{
+					module.Enabled = false;
+					if (module.Enabled && Settings.ReadValue("q2Tool.Plugin", module.Name.Substring(14)) == string.Empty)
+						Settings.WriteValue("q2Tool.Plugin", module.Name.Substring(14), "enabled");
+				}
+			}
+
+			return updater.GetUpdateFileList().Count > 0;
 		}
 
 		private static void LoadPlugins()

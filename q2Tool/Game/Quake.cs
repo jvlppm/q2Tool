@@ -22,10 +22,6 @@ namespace q2Tool
 		public string Name { get; private set; }
 		public string CFG { get; set; }
 
-		#region Events
-		public static event GameLaunchEventHandler OnGameLaunch;
-		#endregion
-
 		public Quake(string path) : this(path, string.Empty) { }
 
 		public Quake(string path, string name)
@@ -50,6 +46,9 @@ namespace q2Tool
 			#endregion
 		}
 
+		public string Ip { get; private set; }
+		public int Port { get; private set; }
+
 		public void Run(string server)
 		{
 			int serverPort = 27910;
@@ -72,8 +71,9 @@ namespace q2Tool
 					throw new Exception(string.Format("Bad server port: \"{0}\"", address[1]), ex);
 				}
 			}
-
-			Run(address[0], serverPort);
+			Port = serverPort;
+			Ip = address[0];
+			Run(Ip, Port);
 		}
 
 		public void Run(string serverAddress, int serverPort)
@@ -83,8 +83,7 @@ namespace q2Tool
 			if (processList.Length < 1)
 			{
 				var launchEventArgs = new GameLaunchEventArgs();
-				if (OnGameLaunch != null)
-					OnGameLaunch(this, launchEventArgs);
+
 				string customCFG = Settings.ReadValue("Game", "CustomCFG");
 				var pi = new ProcessStartInfo(Path,
 				                              "+set game action " + launchEventArgs.CustomArgs +
