@@ -21,7 +21,7 @@ namespace q2Tool
 
 		protected override void OnGameStart()
 		{
-			Quake.OnStuffText += OnStuffText;
+			Quake.OnServerStuffText += OnStuffText;
 		}
 
 		void OnStuffText(Quake sender, ServerCommandEventArgs<Commands.Server.StuffText> e)

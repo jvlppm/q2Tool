@@ -26,7 +26,7 @@ namespace q2Tool
 						foreach (var file in updater.GetUpdateFileList())
 							updater.DownloadFile(file);
 
-						Process.Start("Update.exe", "--wait-process q2Tool --auto-execute \"q2Tool.exe --disable-updates\"");
+						Process.Start("Update.exe", "--wait-process q2Tool --auto-execute \"q2Tool.exe\"");
 						return;
 					}
 					else

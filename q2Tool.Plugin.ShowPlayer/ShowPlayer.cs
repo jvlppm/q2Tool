@@ -16,29 +16,26 @@ namespace q2Tool
 
 		protected override void OnGameStart()
 		{
-			Quake.OnPrint += Quake_OnPrint;
-			Quake.OnStringCmd += Quake_OnStringCmd;
-			Quake.OnPlayerInfo += Quake_OnPlayerInfo;
+			Quake.OnServerPrint += Quake_OnPrint;
+			Quake.OnClientStringCmd += Quake_OnStringCmd;
+			Quake.OnServerPlayerInfo += Quake_OnPlayerInfo;
 		}
 
 		void Quake_OnPlayerInfo(Quake sender, ServerCommandEventArgs<PlayerInfo> e)
 		{
 			if (!_players.ContainsKey(e.Command.Id + 1))
 				_players.Add(e.Command.Id + 1, e.Command.Name);
-			else
+			else if (_skins.ContainsKey(e.Command.Id + 1))
 			{
-				if (_players[e.Command.Id + 1] != e.Command.Name)
-					e.Command.Skin = _skins[e.Command.Id + 1];
-				else if(_skins[e.Command.Id + 1] != e.Command.Skin)
+				if (_skins[e.Command.Id + 1] != e.Command.Skin)
 					_skins.Remove(e.Command.Id + 1);
-				
-				_players[e.Command.Id + 1] = e.Command.Name;
+				else e.Command.Skin = _skins[e.Command.Id + 1];
 			}
 		}
 
 		void Quake_OnStringCmd(Quake sender, ClientCommandEventArgs<StringCmd> e)
 		{
-			if (e.Command.Message.StartsWith("show")) // split ' ' cop
+			if (e.Command.Message.StartsWith("show"))
 			{
 				string[] cmd = e.Command.Message.Split(' ');
 
@@ -124,7 +121,7 @@ namespace q2Tool
 						playersList.Append("No players available\n");
 					}
 
-					Quake.SendToClient(new Print(Print.PrintLevel.High, playersList.ToString() + "\n"));
+					e.Command.Message = playersList.ToString() + "\n";
 				}
 			}
 		}

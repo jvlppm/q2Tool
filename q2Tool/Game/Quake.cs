@@ -46,9 +46,6 @@ namespace q2Tool
 			#endregion
 		}
 
-		public string Ip { get; private set; }
-		public int Port { get; private set; }
-
 		public void Run(string server)
 		{
 			int serverPort = 27910;
@@ -71,14 +68,22 @@ namespace q2Tool
 					throw new Exception(string.Format("Bad server port: \"{0}\"", address[1]), ex);
 				}
 			}
-			Port = serverPort;
-			Ip = address[0];
-			Run(Ip, Port);
+			Run(address[0], serverPort);
 		}
 
 		public void Run(string serverAddress, int serverPort)
 		{
-			StartProxy(27910, serverAddress, serverPort);
+			bool proxyStarted = false;
+			do
+			{
+				Random rnd = new Random(DateTime.Now.Millisecond);
+				try
+				{
+					StartProxy(rnd.Next(1024, 65535), serverAddress, serverPort);
+					proxyStarted = true;
+				}
+				catch (System.Net.Sockets.SocketException ex) { }
+			}while(!proxyStarted);
 			var processList = Process.GetProcessesByName(Name);
 			if (processList.Length < 1)
 			{
@@ -87,7 +92,7 @@ namespace q2Tool
 				string customCFG = Settings.ReadValue("Game", "CustomCFG");
 				var pi = new ProcessStartInfo(Path,
 				                              "+set game action " + launchEventArgs.CustomArgs +
-				                              (CFG != string.Empty ? " +exec " + CFG : "") + " +connect localhost:27910")
+				                              (CFG != string.Empty ? " +exec " + CFG : "") + " +connect " + Client.EndPoint)
 				         	{WorkingDirectory = Path};
 				Process.Start(pi);
 			}

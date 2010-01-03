@@ -10,8 +10,8 @@ namespace q2Tool
 		protected override void OnGameStart()
 		{
 			Quake.OnServerData += QuakeOnServerData;
-			Quake.OnPrint += QuakeOnPrint;
-			Quake.OnCenterPrint += QuakeOnCenterPrint;
+			Quake.OnServerPrint += QuakeOnPrint;
+			Quake.OnServerCenterPrint += QuakeOnCenterPrint;
 		}
 
 		static void QuakeOnServerData(Quake sender, ServerCommandEventArgs<ServerData> e)

@@ -25,6 +25,14 @@
 
 				return value;
 			}
+			set
+			{
+				string oldValue = this[value];
+				if (oldValue == null)
+					Message += @"\" + parameter + @"\" + value;
+				else
+					Message = Message.Replace(@"\" + parameter + @"\" + oldValue, @"\" + parameter + @"\" + value);
+			}
 		}
 
 		#region ICommand Members

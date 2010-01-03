@@ -14,9 +14,14 @@ namespace q2Tool
 		readonly Queue<IServerCommand> _fakeServerCommands;
 		readonly Queue<IClientCommand> _fakeClientCommands;
 
+		public ConnectionPoint Server { get; private set; }
+		public ConnectionPoint Client { get; private set; }
+
 		void StartProxy(int localPort, string serverIp, int serverPort)
 		{
-			_proxy.ForwardLocalConnections(localPort, new ConnectionPoint(serverIp, serverPort, true));
+			Client = new ConnectionPoint("127.0.0.1", localPort, false);
+			Server = new ConnectionPoint(serverIp, serverPort, true);
+			_proxy.ForwardConnections(Client, Server);
 		}
 
 		#region Events Definitions
@@ -24,17 +29,17 @@ namespace q2Tool
 		public event ConnectionPackageEventHandler OnServerPackage;
 		public event ServerCommandEventHandler<IServerStringPackage> OnServerStringPackage;
 		public event ServerCommandEventHandler<ServerData> OnServerData;
-		public event ServerCommandEventHandler<CenterPrint> OnCenterPrint;
-		public event ServerCommandEventHandler<Print> OnPrint;
-		public event ServerCommandEventHandler<StuffText> OnStuffText;
-		public event ServerCommandEventHandler<ConfigString> OnConfigString;
-		public event ServerCommandEventHandler<PlayerInfo> OnPlayerInfo;
+		public event ServerCommandEventHandler<CenterPrint> OnServerCenterPrint;
+		public event ServerCommandEventHandler<Print> OnServerPrint;
+		public event ServerCommandEventHandler<StuffText> OnServerStuffText;
+		public event ServerCommandEventHandler<ConfigString> OnServerConfigString;
+		public event ServerCommandEventHandler<PlayerInfo> OnServerPlayerInfo;
 		#endregion
 		#region Client
 		public event ConnectionPackageEventHandler OnClientPackage;
 		public event ClientCommandEventHandler<IClientStringPackage> OnClientStringPackage;
-		public event ClientCommandEventHandler<StringCmd> OnStringCmd;
-		public event ClientCommandEventHandler<UserInfo> OnUserInfo;
+		public event ClientCommandEventHandler<StringCmd> OnClientStringCmd;
+		public event ClientCommandEventHandler<UserInfo> OnClientUserInfo;
 		#endregion
 		#endregion
 
@@ -61,11 +66,11 @@ namespace q2Tool
 				switch(cmd.Type)
 				{
 					case ClientCommand.StringCmd:
-						OnStringCmd.Fire(this, (StringCmd)cmd);
+						OnClientStringCmd.Fire(this, (StringCmd)cmd);
 						OnClientStringPackage.Fire(this, (IClientStringPackage) cmd);
 						break;
 					case ClientCommand.UserInfo:
-						OnUserInfo.Fire(this, (UserInfo)cmd);
+						OnClientUserInfo.Fire(this, (UserInfo)cmd);
 						OnClientStringPackage.Fire(this, (IClientStringPackage)cmd);
 						break;
 				}
@@ -100,17 +105,17 @@ namespace q2Tool
 						break;
 
 					case ServerCommand.CenterPrint:
-						OnCenterPrint.Fire(this, (CenterPrint)cmd);
+						OnServerCenterPrint.Fire(this, (CenterPrint)cmd);
 						OnServerStringPackage.Fire(this, (IServerStringPackage)cmd);
 						break;
 
 					case ServerCommand.Print:
-						OnPrint.Fire(this, (Print)cmd);
+						OnServerPrint.Fire(this, (Print)cmd);
 						OnServerStringPackage.Fire(this, (IServerStringPackage)cmd);
 						break;
 
 					case ServerCommand.StuffText:
-						OnStuffText.Fire(this, (StuffText)cmd);
+						OnServerStuffText.Fire(this, (StuffText)cmd);
 						OnServerStringPackage.Fire(this, (IServerStringPackage)cmd);
 						break;
 
@@ -118,13 +123,13 @@ namespace q2Tool
 						switch (((ConfigString)cmd).ConfigType)
 						{
 							case ConfigStringType.PlayerInfo:
-								OnPlayerInfo.Fire(this, (PlayerInfo)cmd);
-								OnConfigString.Fire(this, (PlayerInfo)cmd);
+								OnServerPlayerInfo.Fire(this, (PlayerInfo)cmd);
+								OnServerConfigString.Fire(this, (PlayerInfo)cmd);
 								OnServerStringPackage.Fire(this, (PlayerInfo)cmd);
 								break;
 
 							default:
-								OnConfigString.Fire(this, (ConfigString)cmd);
+								OnServerConfigString.Fire(this, (ConfigString)cmd);
 								OnServerStringPackage.Fire(this, (ConfigString)cmd);
 								break;
 						}
