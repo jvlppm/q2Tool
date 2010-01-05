@@ -73,8 +73,8 @@ namespace q2Tool
 		{
 			foreach (string player in _binds.Keys)
 			{
-				string filePath = Quake.Directory + "Action/Binds/" + player + ".txt";
-				filePath = filePath.Replace("*", "").Replace("/", "");
+				string filePath = Quake.Directory + "Action/Binds/" + player.Replace("/", "") + ".txt";
+				filePath = filePath.Replace("*", "");
 				using (StreamWriter file = new StreamWriter(filePath))
 				{
 					var playerBinds = from bind in _binds[player]
