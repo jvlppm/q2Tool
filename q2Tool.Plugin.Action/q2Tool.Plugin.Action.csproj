@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{1D5292F4-F906-4934-A3EF-FE4EF12BFCE1}</ProjectGuid>
+    <ProjectGuid>{B4B6026B-BFF2-464A-A4FC-445561037A6D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>q2Tool.Plugin.SpeedJump</RootNamespace>
-    <AssemblyName>q2Tool.Plugin.SpeedJump</AssemblyName>
+    <RootNamespace>q2Tool.Plugin.Action</RootNamespace>
+    <AssemblyName>q2Tool.Plugin.Action</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -31,22 +31,23 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="SpeedJump.cs" />
+    <Compile Include="Action.cs" />
+    <Compile Include="Connect.cs" />
+    <Compile Include="Player.cs" />
+    <Compile Include="PlayerChangeName.cs" />
+    <Compile Include="PlayerMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Round.cs" />
+    <Compile Include="ServerMessage.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\q2Tool.Plugin.Action\q2Tool.Plugin.Action.csproj">
-      <Project>{B4B6026B-BFF2-464A-A4FC-445561037A6D}</Project>
-      <Name>q2Tool.Plugin.Action</Name>
-    </ProjectReference>
     <ProjectReference Include="..\q2Tool\q2Tool.csproj">
       <Project>{FF54F892-6E51-47B7-B0A6-5CA8398FBD08}</Project>
       <Name>q2Tool</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Jv.Plugins, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Jv.Plugins">
       <HintPath>..\References\Jv.Plugins.dll</HintPath>
     </Reference>
   </ItemGroup>

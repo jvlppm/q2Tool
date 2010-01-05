@@ -18,7 +18,8 @@ namespace q2Tool
 		public const int MaxGeneral = MaxClients * 2;
 		#endregion
 
-		public static string Path { get; private set; }
+		public string Directory { get; private set; }
+		public string Path { get; private set; }
 		public string Name { get; private set; }
 		public string CFG { get; set; }
 
@@ -30,6 +31,7 @@ namespace q2Tool
 				throw new Exception("Empty game path");
 
 			Path = path.Replace("\\", "/");
+			Directory = Path.Substring(0, Path.LastIndexOf('/') + 1);
 
 			if (name == string.Empty)
 				Name = Path.Substring(Path.LastIndexOf('/') + 1, Path.Length - 5 - Path.LastIndexOf('/'));
@@ -82,7 +84,7 @@ namespace q2Tool
 					StartProxy(rnd.Next(1024, 65535), serverAddress, serverPort);
 					proxyStarted = true;
 				}
-				catch (System.Net.Sockets.SocketException ex) { }
+				catch (System.Net.Sockets.SocketException) { }
 			}while(!proxyStarted);
 			var processList = Process.GetProcessesByName(Name);
 			if (processList.Length < 1)
@@ -93,7 +95,7 @@ namespace q2Tool
 				var pi = new ProcessStartInfo(Path,
 				                              "+set game action " + launchEventArgs.CustomArgs +
 				                              (CFG != string.Empty ? " +exec " + CFG : "") + " +connect " + Client.EndPoint)
-				         	{WorkingDirectory = Path};
+				         	{WorkingDirectory = Directory};
 				Process.Start(pi);
 			}
 		}

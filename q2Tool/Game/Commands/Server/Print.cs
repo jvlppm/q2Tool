@@ -26,10 +26,18 @@ namespace q2Tool.Commands.Server
 		}
 
 		#region ICommand
-		public int Size() { return Message.Length + 3; }
+		public int Size()
+		{
+			if (string.IsNullOrEmpty(Message))
+				return 0;
+			return Message.Length + 3;
+		}
 
 		public void WriteTo(RawPackage data)
 		{
+			if (string.IsNullOrEmpty(Message))
+				return;
+
 			data.WriteByte((byte)Type);
 			data.WriteByte((byte)Level);
 			data.WriteString(Message);

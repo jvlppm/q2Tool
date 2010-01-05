@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{1D5292F4-F906-4934-A3EF-FE4EF12BFCE1}</ProjectGuid>
+    <ProjectGuid>{CDCA1457-A015-4A88-913D-44CF2302A820}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>q2Tool.Plugin.SpeedJump</RootNamespace>
-    <AssemblyName>q2Tool.Plugin.SpeedJump</AssemblyName>
+    <RootNamespace>q2Tool.Plugin.SaveBinds</RootNamespace>
+    <AssemblyName>q2Tool.Plugin.SaveBinds</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -31,7 +31,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="SpeedJump.cs" />
+    <Compile Include="SaveBinds.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

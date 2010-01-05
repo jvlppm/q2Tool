@@ -68,8 +68,16 @@ namespace q2Tool
 
 				foreach (Plugin plugin in PluginManager.GetPlugins<Plugin>())
 				{
-					plugin.Quake = quake;
-					plugin.OnGameStart();
+					try
+					{
+						plugin.Quake = quake;
+						plugin.GameStart();
+					}
+					catch (Exception ex)
+					{
+						Console.WriteLine("Plugin {0} could not be loaded: {1}.", plugin.GetType().Name, ex.Message);
+						PluginManager.UnLoadPlugin(plugin);
+					}
 				}
 			}
 			catch (Exception ex)

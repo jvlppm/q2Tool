@@ -1,4 +1,6 @@
 ﻿using q2Tool.Commands.Server;
+using System;
+
 namespace q2Tool
 {
 	public class SpeedJump : Plugin
@@ -7,7 +9,7 @@ namespace q2Tool
 
 		protected override void OnGameStart()
 		{
-			Quake.OnServerData += (s, c) => Quake.OnServerPrint += Activate;
+			GetPlugin<PAction>().OnConnectedToServer += Activate;
 			Quake.OnClientUserInfo += Quake_OnUserInfo;
 		}
 
@@ -25,13 +27,11 @@ namespace q2Tool
 			}
 		}
 
-		void Activate(Quake sender, ServerCommandEventArgs<Print> command)
+		void Activate(Action sender, EventArgs e)
 		{
 			Quake.SendToClient(new ConfigString(ConfigStringType.MaxClients, "1"));
 			Quake.ExecuteCommand("alias +sjump \"timescale 3.5;+moveup\"");
 			Quake.ExecuteCommand("alias -sjump \"timescale 1;-moveup\"");
-
-			Quake.OnServerPrint -= Activate;
 		}
 	}
 }

@@ -41,6 +41,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\q2Tool.Plugin.Action\q2Tool.Plugin.Action.csproj">
+      <Project>{B4B6026B-BFF2-464A-A4FC-445561037A6D}</Project>
+      <Name>q2Tool.Plugin.Action</Name>
+    </ProjectReference>
     <ProjectReference Include="..\q2Tool\q2Tool.csproj">
       <Project>{FF54F892-6E51-47B7-B0A6-5CA8398FBD08}</Project>
       <Name>q2Tool</Name>
