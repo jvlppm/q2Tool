@@ -13,13 +13,12 @@ namespace q2Tool
 				Show(color, text + "\n");
 		}
 
-		static void ShowLine(ConsoleColor color, string format, params object[] args)
+		static void Show(ConsoleColor color, string text)
 		{
-			string text = string.Format(format, args);
-			if (format.EndsWith("\n") || text.Length % Console.WindowWidth == 0)
-				Show(color, format, args);
-			else
-				Show(color, text + "\n");
+			ConsoleColor oldColor = Console.ForegroundColor;
+			Console.ForegroundColor = color;
+			Console.Write(text);
+			Console.ForegroundColor = oldColor;
 		}
 
 		static void Show(ConsoleColor color, string format, params object[] args)
