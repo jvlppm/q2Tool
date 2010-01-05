@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using q2Tool.Commands.Server;
 using System;
+using System.Linq;
+
 namespace q2Tool
 {
 	public abstract class PAction : Plugin
@@ -12,7 +14,19 @@ namespace q2Tool
 		public abstract event ConnectedToServerEventHandler OnConnectedToServer;
 		public abstract event PlayerChangeNameEventHandler OnPlayerChangeName;
 
-		public Dictionary<string, Player> PlayersByName { get; protected set; }
+		public Player GetPlayerByName(string name)
+		{
+			var players = Players.Where(p => p.Name == name);
+
+			if (players.Count() == 0)
+				return null;
+
+			if (players.Count() > 1)
+				return new Player(players.First().Name, -1);
+			
+			return players.First();
+		}
+
 		public Dictionary<int, Player> PlayersById { get; protected set; }
 		public Dictionary<int, Player>.ValueCollection Players { get { return PlayersById.Values; } }
 	}
@@ -26,12 +40,10 @@ namespace q2Tool
 		public override event ConnectedToServerEventHandler OnConnectedToServer;
 		public override event PlayerChangeNameEventHandler OnPlayerChangeName;
 
-		Dictionary<string, Player> _newPlayersByName;
 		Dictionary<int, Player> _newPlayersById;
 
 		public Action()
 		{
-			PlayersByName = new Dictionary<string, Player>();
 			PlayersById = new Dictionary<int, Player>();
 		}
 		protected override void OnGameStart()
@@ -48,14 +60,11 @@ namespace q2Tool
 			{
 				Player player = new Player(name, id);
 				PlayersById.Add(id, player);
-				PlayersByName.Add(name, player);
 			}
 			else if (PlayersById[id].Name != name)
 			{
 				string oldName = PlayersById[id].Name;
 				PlayersById[id].Name = name;
-				PlayersByName.Remove(oldName);
-				PlayersByName.Add(name, PlayersById[id]);
 				if (OnPlayerChangeName != null)
 					OnPlayerChangeName(this, new PlayerChangeNameEventArgs(oldName, PlayersById[id]));
 			}
@@ -63,7 +72,6 @@ namespace q2Tool
 
 		void UpdatePlayerList()
 		{
-			_newPlayersByName = new Dictionary<string, Player>();
 			_newPlayersById = new Dictionary<int, Player>();
 
 			Quake.OnServerPrint += GetPlayerList;
@@ -81,7 +89,6 @@ namespace q2Tool
 				string playerName = message.Substring(0, message.IndexOf(' '));
 
 				Player newPlayer = new Player(playerName, playerNumber);
-				_newPlayersByName.Add(playerName, newPlayer);
 				_newPlayersById.Add(playerNumber, newPlayer);
 
 				e.Command.Message = null;
@@ -93,25 +100,7 @@ namespace q2Tool
 				e.Command.Message = null;
 				Quake.OnServerPrint -= GetPlayerList;
 
-				if (OnPlayerChangeName != null)
-				{
-					foreach (var newPlayer in _newPlayersByName.Values)
-					{
-						foreach (var player in Players)
-						{
-							if (player.Id == newPlayer.Id)
-							{
-								if (newPlayer.Name != player.Name)
-									OnPlayerChangeName(this, new PlayerChangeNameEventArgs(player.Name, newPlayer));
-								break;
-							}
-						}
-					}
-				}
-
-				PlayersByName = _newPlayersByName;
 				PlayersById = _newPlayersById;
-				_newPlayersByName = null;
 				_newPlayersById = null;
 			}
 			else if(message.StartsWith("\n"))
@@ -145,24 +134,6 @@ namespace q2Tool
 					if (message.Contains("is over"))
 						OnRoundEnd(this, EventArgs.Empty);
 				}
-
-				if (OnPlayerChangeName != null)
-				{
-					if (message.Contains("changed name to ") && message.EndsWith(".\n"))
-					{
-						message = message.Replace(" changed name to ", "¬").TrimEnd('.', '\n');
-						string[] nicks = message.Split('¬');
-						if (nicks[0] != "pwsnskle" && nicks[1] != "pwsnskle")
-						{
-							if (PlayersByName.ContainsKey(nicks[0]))
-							{
-								Player player = PlayersByName[nicks[0]];
-								player.Name = nicks[1];
-								OnPlayerChangeName(this, new PlayerChangeNameEventArgs(nicks[0], player));
-							}
-						}
-					}
-				}
 			}
 			else
 			{
@@ -187,8 +158,9 @@ namespace q2Tool
 
 					string nick = message.Substring(0, message.IndexOf(": "));
 					message = message.Substring(message.IndexOf(": ") + 2).Replace("\n", "").Replace("\r", "");
-					if (PlayersByName.ContainsKey(nick))
-						OnPlayerMessage(this, new PlayerMessageEventArgs(PlayersByName[nick], message, dead));
+					Player player = GetPlayerByName(nick);
+					if (player != null)
+						OnPlayerMessage(this, new PlayerMessageEventArgs(player, message, dead));
 				}
 			}
 		}
