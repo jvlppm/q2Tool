@@ -13,6 +13,7 @@ namespace q2Tool
 		public abstract event RoundEndEventHandler OnRoundEnd;
 		public abstract event ConnectedToServerEventHandler OnConnectedToServer;
 		public abstract event PlayerChangeNameEventHandler OnPlayerChangeName;
+		public abstract event PlayerEventHandler OnPlayerDisconnected;
 
 		public Player GetPlayerByName(string name)
 		{
@@ -27,6 +28,13 @@ namespace q2Tool
 			return players.First();
 		}
 
+		protected void RemPlayerByName(string name)
+		{
+			Player player = GetPlayerByName(name);
+			if (player != null)
+				PlayersById.Remove(player.Id);
+		}
+
 		public Dictionary<int, Player> PlayersById { get; protected set; }
 		public Dictionary<int, Player>.ValueCollection Players { get { return PlayersById.Values; } }
 	}
@@ -39,6 +47,7 @@ namespace q2Tool
 		public override event RoundEndEventHandler OnRoundEnd;
 		public override event ConnectedToServerEventHandler OnConnectedToServer;
 		public override event PlayerChangeNameEventHandler OnPlayerChangeName;
+		public override event PlayerEventHandler OnPlayerDisconnected;
 
 		Dictionary<int, Player> _newPlayersById;
 
@@ -52,6 +61,29 @@ namespace q2Tool
 			Quake.OnServerCenterPrint += Quake_OnServerCenterPrint;
 			Quake.OnServerPlayerInfo += (s, e) => AddPlayer(e.Command.Id, e.Command.Name);
 			OnConnectedToServer += (s, e) => UpdatePlayerList();
+			OnServerMessage += new ServerMessageEventHandler(Action_OnServerMessage);
+		}
+
+		void Action_OnServerMessage(Action sender, ServerMessageEventArgs e)
+		{
+			if (OnRoundEnd != null)
+			{
+				if (e.Message.Contains("is over"))
+					OnRoundEnd(this, EventArgs.Empty);
+			}
+			if(e.Message.EndsWith(" disconnected\n"))
+			{
+				string nick = e.Message.Substring(0, e.Message.Length - 14);
+				Player player = GetPlayerByName(nick);
+				if (player != null)
+				{
+					PlayersById.Remove(player.Id);
+
+					if (OnPlayerDisconnected != null)
+						OnPlayerDisconnected(this, new PlayerEventArgs(player));
+				}
+				else UpdatePlayerList();
+			}
 		}
 
 		void AddPlayer(int id, string name)
@@ -125,15 +157,7 @@ namespace q2Tool
 			if (e.Command.Level != Print.PrintLevel.Chat)
 			{
 				if (OnServerMessage != null)
-				{
 					OnServerMessage(this, new ServerMessageEventArgs(e.Command.Message, e.Command.Level));
-				}
-
-				if (OnRoundEnd != null)
-				{
-					if (message.Contains("is over"))
-						OnRoundEnd(this, EventArgs.Empty);
-				}
 			}
 			else
 			{
@@ -157,6 +181,13 @@ namespace q2Tool
 					}
 
 					string nick = message.Substring(0, message.IndexOf(": "));
+					if (nick.EndsWith(" "))
+					{
+						Player fixPlayer = GetPlayerByName(nick.Trim(' '));
+						if(fixPlayer != null)
+							fixPlayer.Name = nick;
+					}
+
 					message = message.Substring(message.IndexOf(": ") + 2).Replace("\n", "").Replace("\r", "");
 					Player player = GetPlayerByName(nick);
 					if (player != null)

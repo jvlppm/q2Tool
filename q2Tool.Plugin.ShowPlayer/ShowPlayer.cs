@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using q2Tool.Commands.Client;
 using q2Tool.Commands.Server;
+using System.Linq;
 
 namespace q2Tool
 {
@@ -66,7 +67,7 @@ namespace q2Tool
 			playersList.Append("Available players:\n");
 			playersList.Append(" #  Name\n");
 			playersList.Append("------------------------------------\n");
-			foreach (var player in GetPlugin<PAction>().Players)
+			foreach (var player in GetPlugin<PAction>().Players.OrderBy(p => p.Id))
 			{
 				if (_skins.ContainsKey(player.Id))
 					playersList.Append(" " + player.Id + "  " + player.Name + "  " + _skins[player.Id] + "\n");
