@@ -13,11 +13,11 @@ namespace q2Tool.Commands.Server
 
 		public ServerProtocol Protocol { get; private set; }
 		public int ServerCount { get; private set; }
-		public byte AttractLoop { get; private set; }
-		public string GameDir { get; private set; }
+		public byte AttractLoop { get; set; }
+		public string GameDir { get; set; }
 		public short PlayerNum { get; private set; }
 		public string LevelName { get; private set; }
-		public byte StrafeHack { get; private set; }
+		public byte StrafeHack { get; set; }
 		public short ProtocolVersion { get; private set; }
 		public byte EnhancedVersion { get; private set; }
 		public byte Unknown { get; private set; }
