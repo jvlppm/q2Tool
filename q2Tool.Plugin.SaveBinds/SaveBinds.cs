@@ -59,7 +59,7 @@ namespace q2Tool
 					while (!file.EndOfStream)
 					{
 						string line = file.ReadLine();
-						playerBinds.Add(line.Substring(2), int.Parse(line.Substring(0, line.IndexOf(' '))));
+						playerBinds.Add(line.Substring(line.IndexOf(" ") + 1), int.Parse(line.Substring(0, line.IndexOf(' '))));
 					}
 				}
 
