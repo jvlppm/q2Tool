@@ -7,23 +7,35 @@ namespace q2Tool
 {
 	public class ShowPlayer : Plugin
 	{
-		readonly Dictionary<int, string> _skins;
+		readonly Dictionary<string, string> _skins;
 
 		public ShowPlayer()
 		{
-			_skins = new Dictionary<int, string>();
+			_skins = new Dictionary<string, string>();
 		}
 
 		protected override void OnGameStart()
 		{
 			Quake.OnClientStringCmd += Quake_OnStringCmd;
 			Quake.OnServerPlayerInfo += Quake_OnPlayerInfo;
+			GetPlugin<PAction>().OnPlayerChangeName += ShowPlayer_OnPlayerChangeName;
+		}
+
+		void ShowPlayer_OnPlayerChangeName(Action sender, PlayerChangeNameEventArgs e)
+		{
+			if (_skins.ContainsKey(e.OldName))
+			{
+				string oldSkin = _skins[e.OldName];
+				_skins.Remove(e.OldName);
+				_skins.Add(e.Player.Name, oldSkin);
+				Quake.SendToClient(new PlayerInfo(e.Player.Id, e.Player.Name, "male", oldSkin));
+			}
 		}
 
 		void Quake_OnPlayerInfo(Quake sender, ServerCommandEventArgs<PlayerInfo> e)
 		{
-			if (_skins.ContainsKey(e.Command.Id))
-				e.Command.Skin = _skins[e.Command.Id];
+			if (_skins.ContainsKey(e.Command.Name))
+				e.Command.Skin = _skins[e.Command.Name];
 		}
 
 		void Quake_OnStringCmd(Quake sender, ClientCommandEventArgs<StringCmd> e)
@@ -47,11 +59,12 @@ namespace q2Tool
 						Quake.SendToClient(new Print(Print.PrintLevel.High, "Bad player number\n"));
 					else
 					{
-						Quake.SendToClient(new PlayerInfo(playerId, GetPlugin<PAction>().PlayersById[playerId].Name, "male", showSkin));
-						if (!_skins.ContainsKey(playerId))
-							_skins.Add(playerId, showSkin);
+						var player = GetPlugin<PAction>().PlayersById[playerId];
+						Quake.SendToClient(new PlayerInfo(player.Id, player.Name, "male", showSkin));
+						if (!_skins.ContainsKey(player.Name))
+							_skins.Add(player.Name, showSkin);
 						else
-							_skins[playerId] = showSkin;
+							_skins[player.Name] = showSkin;
 					}
 				}
 
@@ -69,8 +82,8 @@ namespace q2Tool
 			playersList.Append("------------------------------------\n");
 			foreach (var player in GetPlugin<PAction>().Players.OrderBy(p => p.Id))
 			{
-				if (_skins.ContainsKey(player.Id))
-					playersList.Append(" " + player.Id + "  " + player.Name + "  " + _skins[player.Id] + "\n");
+				if (_skins.ContainsKey(player.Name))
+					playersList.Append(" " + player.Id + "  " + player.Name + "  " + _skins[player.Name] + "\n");
 				else
 					playersList.Append(" " + player.Id + "  " + player.Name + "\n");
 			}
