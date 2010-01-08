@@ -86,9 +86,9 @@ namespace q2Tool
 				}
 				catch (System.Net.Sockets.SocketException) { }
 			}while(!proxyStarted);
-			var processList = Process.GetProcessesByName(Name);
-			if (processList.Length < 1)
-			{
+			//var processList = Process.GetProcessesByName(Name);
+			//if (processList.Length < 1)
+			//{
 				var launchEventArgs = new GameLaunchEventArgs();
 
 				string customCFG = Settings.ReadValue("Game", "CustomCFG");
@@ -97,7 +97,7 @@ namespace q2Tool
 				                              (CFG != string.Empty ? " +exec " + CFG : "") + " +connect " + Client.EndPoint)
 				         	{WorkingDirectory = Directory};
 				Process.Start(pi);
-			}
+			//}
 		}
 	}
 }
