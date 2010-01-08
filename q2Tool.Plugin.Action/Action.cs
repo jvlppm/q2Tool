@@ -61,7 +61,7 @@ namespace q2Tool
 			Quake.OnServerCenterPrint += Quake_OnServerCenterPrint;
 			Quake.OnServerPlayerInfo += (s, e) => AddPlayer(e.Command.Id, e.Command.Name);
 			OnConnectedToServer += (s, e) => UpdatePlayerList();
-			OnServerMessage += new ServerMessageEventHandler(Action_OnServerMessage);
+			OnServerMessage += Action_OnServerMessage;
 		}
 
 		void Action_OnServerMessage(Action sender, ServerMessageEventArgs e)

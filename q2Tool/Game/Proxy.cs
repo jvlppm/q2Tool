@@ -19,7 +19,7 @@ namespace q2Tool
 
 		void StartProxy(int localPort, string serverIp, int serverPort)
 		{
-			Client = new ConnectionPoint("127.0.0.1", localPort, false);
+			Client = new ConnectionPoint(new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, localPort), false);
 			Server = new ConnectionPoint(serverIp, serverPort, true);
 			_proxy.ForwardConnections(Client, Server);
 		}

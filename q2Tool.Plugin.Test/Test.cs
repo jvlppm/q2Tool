@@ -21,14 +21,14 @@ namespace q2Tool
 			}
 			else
 				message = "Server: " + e.Command.Type + ": " + e.Command.Message;
-			MessageToPlugin<PLog>((object)message);
+			MessageToPlugin<PLog>(message);
 			Console.WriteLine(message);
 		}
 
 		void Quake_OnClientStringPackage(Quake sender, ClientCommandEventArgs<IClientStringPackage> e)
 		{
 			string message = "Client: " + e.Command.Type + ": " + e.Command.Message;
-			MessageToPlugin<PLog>((object)message);
+			MessageToPlugin<PLog>(message);
 			Console.WriteLine(message);
 		}
 	}
