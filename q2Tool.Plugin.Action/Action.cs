@@ -118,8 +118,8 @@ namespace q2Tool
 				message = message.Trim(' ');
 				int playerNumber = int.Parse(message.Substring(0, message.IndexOf(' ')));
 				message = message.Substring(message.IndexOf(' ')).Trim(' ');
-				string playerName = message.Substring(0, message.IndexOf(' '));
-
+				string playerName = message.Substring(0, message.LastIndexOf(' ')).Trim(' ');
+				
 				Player newPlayer = new Player(playerName, playerNumber);
 				_newPlayersById.Add(playerNumber, newPlayer);
 
@@ -181,6 +181,9 @@ namespace q2Tool
 					}
 
 					string nick = message.Substring(0, message.IndexOf(": "));
+					bool team = nick.StartsWith("(") && nick.EndsWith(")") && GetPlayerByName(nick) == null;
+					if (team)
+						nick = nick.Substring(1, nick.Length - 2);
 					if (nick.EndsWith(" "))
 					{
 						Player fixPlayer = GetPlayerByName(nick.Trim(' '));
@@ -191,7 +194,7 @@ namespace q2Tool
 					message = message.Substring(message.IndexOf(": ") + 2).Replace("\n", "").Replace("\r", "");
 					Player player = GetPlayerByName(nick);
 					if (player != null)
-						OnPlayerMessage(this, new PlayerMessageEventArgs(player, message, dead));
+						OnPlayerMessage(this, new PlayerMessageEventArgs(player, message, dead, team));
 				}
 			}
 		}

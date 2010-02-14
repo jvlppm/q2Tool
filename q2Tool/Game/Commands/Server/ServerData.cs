@@ -16,7 +16,7 @@ namespace q2Tool.Commands.Server
 		public byte AttractLoop { get; set; }
 		public string GameDir { get; set; }
 		public short PlayerNum { get; private set; }
-		public string LevelName { get; private set; }
+		public string LevelName { get; set; }
 		public byte StrafeHack { get; set; }
 		public short ProtocolVersion { get; private set; }
 		public byte EnhancedVersion { get; private set; }

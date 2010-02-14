@@ -7,12 +7,14 @@ namespace q2Tool
 		public bool Dead { get; private set; }
 		public Player Player { get; private set; }
 		public string Message { get; private set; }
+		public bool TeamMessage { get; private set; }
 
-		public PlayerMessageEventArgs(Player player, string message, bool dead)
+		public PlayerMessageEventArgs(Player player, string message, bool dead, bool team)
 		{
 			Dead = dead;
 			Player = player;
 			Message = message;
+			TeamMessage = team;
 		}
 	}
 

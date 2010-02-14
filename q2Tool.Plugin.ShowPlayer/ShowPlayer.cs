@@ -19,6 +19,17 @@ namespace q2Tool
 			Quake.OnClientStringCmd += Quake_OnStringCmd;
 			Quake.OnServerPlayerInfo += Quake_OnPlayerInfo;
 			GetPlugin<PAction>().OnPlayerChangeName += ShowPlayer_OnPlayerChangeName;
+			GetPlugin<PAction>().OnConnectedToServer += UpdateSkins;
+		}
+
+		void UpdateSkins(Action sender, System.EventArgs e)
+		{
+			foreach (var v in _skins)
+			{
+				Player player = GetPlugin<PAction>().GetPlayerByName(v.Key);
+				if(player != null)
+					Quake.SendToClient(new PlayerInfo(player.Id, player.Name, "male", v.Value));
+			}
 		}
 
 		void ShowPlayer_OnPlayerChangeName(Action sender, PlayerChangeNameEventArgs e)

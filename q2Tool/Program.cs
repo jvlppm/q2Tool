@@ -6,11 +6,11 @@ using System.Diagnostics;
 
 namespace q2Tool
 {
-	class Program
+	public class Program
 	{
 		static readonly Manager PluginManager = new Manager();
 
-		static void Main(string[] args)
+		public static void Main(string[] args)
 		{
 			try
 			{
