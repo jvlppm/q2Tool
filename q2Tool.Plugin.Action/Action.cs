@@ -194,7 +194,7 @@ namespace q2Tool
 					message = message.Substring(message.IndexOf(": ") + 2).Replace("\n", "").Replace("\r", "");
 					Player player = GetPlayerByName(nick);
 					if (player != null)
-						OnPlayerMessage(this, new PlayerMessageEventArgs(player, message, dead, team));
+						OnPlayerMessage(this, new PlayerMessageEventArgs(player, message, dead, team, Players));
 				}
 			}
 		}

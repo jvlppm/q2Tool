@@ -16,7 +16,7 @@ namespace q2Tool
 
 		protected override void OnGameStart()
 		{
-			GetPlugin<PAction>().OnPlayerMessage += (s, e) => PlayerMessage(e.Player.Name, e.Message);
+			GetPlugin<PAction>().OnPlayerMessage += (s, e) => PlayerMessage(e.Player.Name, e.CodedMessage);
 			GetPlugin<PAction>().OnRoundEnd += (s, e) => SavePlayersBinds();
 			GetPlugin<PAction>().OnPlayerChangeName += aq2_OnPlayerChangeName;
 		}
@@ -34,50 +34,10 @@ namespace q2Tool
 			if (!_binds.ContainsKey(nick))
 				LoadPlayerBinds(nick);
 
-			message = IdentifyPlayers(message);
-			message = IdentifyHitLocations(message);
-			message = IdentifyWeapons(message);
-
 			if(_binds[nick].ContainsKey(message))
 				_binds[nick][message]++;
 			else
 				_binds[nick].Add(message, 1);
-		}
-
-		string IdentifyHitLocations(string message)
-		{
-			message = message.Replace("head", "%D");
-			message = message.Replace("stomach", "%D");
-			message = message.Replace("legs", "%D");
-			message = message.Replace("chest", "%D");
-			message = message.Replace("body", "%D");
-			message = message.Replace("kevlar vest", "%D");
-			message = message.Replace("nothing", "%D");
-			return message;
-		}
-
-		string IdentifyWeapons(string message)
-		{
-			message = message.Replace("Sniper Rifle", "%W");
-			message = message.Replace("M4 Assault Rifle", "%W");
-			message = message.Replace("MK23 Pistol", "%W");
-			return message;
-		}
-
-		string IdentifyPlayers(string message)
-		{
-			foreach (Player player in GetPlugin<PAction>().Players)
-				message = message.Replace(player.Name, "%K");
-
-			message = message.Replace("nobody", "%K");
-
-			while (message.Contains("%K, %K"))
-				message = message.Replace("%K, %K", "%K");
-
-			while (message.Contains("%K and %K"))
-				message = message.Replace("%K and %K", "%K");
-
-			return message;
 		}
 
 		void LoadPlayerBinds(string nick)
