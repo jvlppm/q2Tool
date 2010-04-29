@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "q2Tool.Plugin.Action", "q2T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "q2Tool.Plugin.SaveBinds", "q2Tool.Plugin.SaveBinds\q2Tool.Plugin.SaveBinds.csproj", "{CDCA1457-A015-4A88-913D-44CF2302A820}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "q2Tool.Plugin.HttpServer", "q2Tool.Plugin.HttpServer\q2Tool.Plugin.HttpServer.csproj", "{93F79D28-4DB1-4A83-A2F8-BCA2941BFB85}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{CDCA1457-A015-4A88-913D-44CF2302A820}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDCA1457-A015-4A88-913D-44CF2302A820}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDCA1457-A015-4A88-913D-44CF2302A820}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93F79D28-4DB1-4A83-A2F8-BCA2941BFB85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93F79D28-4DB1-4A83-A2F8-BCA2941BFB85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93F79D28-4DB1-4A83-A2F8-BCA2941BFB85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93F79D28-4DB1-4A83-A2F8-BCA2941BFB85}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,5 +82,6 @@ Global
 		{F96F2286-7C97-4D63-9489-3042D76C9E00} = {86B2FE31-E644-4033-9C4C-E1C4A75049CC}
 		{B4B6026B-BFF2-464A-A4FC-445561037A6D} = {86B2FE31-E644-4033-9C4C-E1C4A75049CC}
 		{CDCA1457-A015-4A88-913D-44CF2302A820} = {86B2FE31-E644-4033-9C4C-E1C4A75049CC}
+		{93F79D28-4DB1-4A83-A2F8-BCA2941BFB85} = {86B2FE31-E644-4033-9C4C-E1C4A75049CC}
 	EndGlobalSection
 EndGlobal

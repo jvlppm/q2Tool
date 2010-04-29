@@ -5,13 +5,14 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{E7A81F97-6856-464C-9F79-EA928A45B5A9}</ProjectGuid>
+    <ProjectGuid>{93F79D28-4DB1-4A83-A2F8-BCA2941BFB85}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>q2Tool.Plugin.Test</RootNamespace>
-    <AssemblyName>q2Tool.Plugin.Test</AssemblyName>
+    <RootNamespace>q2Tool.Plugin.HttpServer</RootNamespace>
+    <AssemblyName>q2Tool.Plugin.HttpServer</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,14 +26,24 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Test.cs" />
+    <Reference Include="HttpServer">
+      <HintPath>..\References\HttpServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Jv.Plugins">
+      <HintPath>..\References\Jv.Plugins.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="HttpServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\q2Tool.Plugin.Action\q2Tool.Plugin.Action.csproj">
@@ -43,16 +54,6 @@
       <Project>{FF54F892-6E51-47B7-B0A6-5CA8398FBD08}</Project>
       <Name>q2Tool</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="HttpServer, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d7063c47c583695a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\HttpServer.dll</HintPath>
-    </Reference>
-    <Reference Include="Jv.Plugins">
-      <HintPath>..\References\Jv.Plugins.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
