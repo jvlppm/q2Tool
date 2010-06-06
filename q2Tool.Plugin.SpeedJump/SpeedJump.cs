@@ -5,7 +5,7 @@ namespace q2Tool
 {
 	public class SpeedJump : Plugin
 	{
-		bool ignore;
+		bool _ignore;
 
 		protected override void OnGameStart()
 		{
@@ -15,15 +15,15 @@ namespace q2Tool
 
 		void Quake_OnUserInfo(Quake sender, ClientCommandEventArgs<Commands.Client.UserInfo> e)
 		{
-			if (ignore)
+			if (_ignore)
 			{
 				e.Command.Message = string.Empty;
-				ignore = false;
+				_ignore = false;
 			}
 			else if (e.Command["timescale"] != null && e.Command["timescale"] != "1")
 			{
 				e.Command.Message = string.Empty;
-				ignore = true;
+				_ignore = true;
 			}
 		}
 

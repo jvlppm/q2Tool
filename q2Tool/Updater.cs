@@ -140,7 +140,7 @@ namespace Update
 			return modules.ToList();
 		}
 
-		List<FileInfo> GetFileList()
+		IEnumerable<FileInfo> GetFileList()
 		{
 			List<FileInfo> files = new List<FileInfo>();
 

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace q2Tool
+﻿namespace q2Tool
 {
 	public class PlayerChangeNameEventArgs : PlayerEventArgs
 	{

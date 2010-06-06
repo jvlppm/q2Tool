@@ -99,7 +99,7 @@ namespace q2Tool
 					playersList.Append(" " + player.Id + "  " + player.Name + "\n");
 			}
 
-			return playersList.ToString() + "\n";
+			return playersList + "\n";
 		}
 	}
 }

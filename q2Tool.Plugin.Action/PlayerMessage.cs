@@ -11,7 +11,7 @@ namespace q2Tool
 		public string CodedMessage { get; private set; }
 		public bool TeamMessage { get; private set; }
 
-		public PlayerMessageEventArgs(Player player, string message, bool dead, bool team, Dictionary<int, Player>.ValueCollection players)
+		public PlayerMessageEventArgs(Player player, string message, bool dead, bool team, IEnumerable<Player> players)
 		{
 			Dead = dead;
 			Player = player;
@@ -21,12 +21,12 @@ namespace q2Tool
 			CodedMessage = ParsePlayerMessage(message, players);
 		}
 
-		string ParsePlayerMessage(string message, Dictionary<int, Player>.ValueCollection players)
+		static string ParsePlayerMessage(string message, IEnumerable<Player> players)
 		{
 			return IdentifyHitLocations(IdentifyWeapons(IdentifyPlayers(message, players)));
 		}
 
-		string IdentifyHitLocations(string message)
+		static string IdentifyHitLocations(string message)
 		{
 			message = message.Replace("head", "%D");
 			message = message.Replace("stomach", "%D");
@@ -38,7 +38,7 @@ namespace q2Tool
 			return message;
 		}
 
-		string IdentifyWeapons(string message)
+		static string IdentifyWeapons(string message)
 		{
 			message = message.Replace("Sniper Rifle", "%W");
 			message = message.Replace("M4 Assault Rifle", "%W");
@@ -46,7 +46,7 @@ namespace q2Tool
 			return message;
 		}
 
-		string IdentifyPlayers(string message, Dictionary<int, Player>.ValueCollection players)
+		static string IdentifyPlayers(string message, IEnumerable<Player> players)
 		{
 			foreach (Player player in players)
 				message = message.Replace(player.Name, "%K");

@@ -33,10 +33,7 @@ namespace q2Tool
 			Path = path.Replace("\\", "/");
 			Directory = Path.Substring(0, Path.LastIndexOf('/') + 1);
 
-			if (name == string.Empty)
-				Name = Path.Substring(Path.LastIndexOf('/') + 1, Path.Length - 5 - Path.LastIndexOf('/'));
-			else
-				Name = name;
+			Name = name == string.Empty ? Path.Substring(Path.LastIndexOf('/') + 1, Path.Length - 5 - Path.LastIndexOf('/')) : name;
 
 			#region CreateProxy
 			_fakeServerCommands = new Queue<IServerCommand>();
@@ -86,18 +83,17 @@ namespace q2Tool
 				}
 				catch (System.Net.Sockets.SocketException) { }
 			}while(!proxyStarted);
-			//var processList = Process.GetProcessesByName(Name);
-			//if (processList.Length < 1)
-			//{
-				var launchEventArgs = new GameLaunchEventArgs();
 
-				string customCFG = Settings.ReadValue("Game", "CustomCFG");
-				var pi = new ProcessStartInfo(Path,
-				                              "+set game action " + launchEventArgs.CustomArgs +
-				                              (CFG != string.Empty ? " +exec " + CFG : "") + " +connect " + Client.EndPoint)
-				         	{WorkingDirectory = Directory};
-				Process.Start(pi);
-			//}
+			foreach (var process in Process.GetProcessesByName(Name))
+				process.Close();
+			
+			var launchEventArgs = new GameLaunchEventArgs();
+
+			var pi = new ProcessStartInfo(Path,
+			                              "+set game action " + launchEventArgs.CustomArgs +
+			                              (CFG != string.Empty ? " +exec " + CFG : "") + " +connect " + Client.EndPoint)
+			         	{WorkingDirectory = Directory};
+			Process.Start(pi);
 		}
 	}
 }

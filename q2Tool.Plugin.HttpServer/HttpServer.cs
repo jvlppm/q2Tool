@@ -1,11 +1,8 @@
 ﻿using System;
-using Jv.Plugins;
 using q2Tool.Commands.Server;
-using System.IO;
 using HttpServer;
 using System.Text;
 using System.Collections.Generic;
-using System.Linq;
 using HttpServer.Headers;
 
 namespace q2Tool
@@ -13,10 +10,9 @@ namespace q2Tool
 	public class HttpServer : Plugin
 	{
 		const int BufferSize = 40;
-		EventArgs[] console_buffer = new EventArgs[BufferSize];
-		int initial = 0, last = 0;
+		readonly EventArgs[] _consoleBuffer = new EventArgs[BufferSize];
+		int _initial, _last;
 		readonly Dictionary<Player, Dictionary<string, int>> _binds;
-		int PlayerNum;
 
 		public HttpServer()
 		{
@@ -28,8 +24,6 @@ namespace q2Tool
 			HttpListener listener = HttpListener.Create(System.Net.IPAddress.Any, 8080);
 			listener.RequestReceived += OnRequest;
 			listener.Start(5);
-
-			Quake.OnServerData += (s, e) => PlayerNum = e.Command.PlayerNum;
 
 			GetPlugin<PAction>().OnPlayerMessage += PlayerMessage;
 			GetPlugin<PAction>().OnServerMessage += (s, e) => AddToBuffer(e);
@@ -59,7 +53,7 @@ namespace q2Tool
 				if (eventArgs is ServerMessageEventArgs)
 				{
 					var evnt = (ServerMessageEventArgs)eventArgs;
-					text = highlightNames(evnt.Message);
+					text = HighlightNames(evnt.Message);
 					color = "gray";
 					switch (evnt.Level)
 					{
@@ -82,7 +76,7 @@ namespace q2Tool
 
 					if (evnt.Dead)
 						text += "[DEAD] ";
-					text += "<b>" + evnt.Player.Name + "</b>: " + highlightNames(findEmoticons(evnt.Message)).Replace("\\", "\\\\") + "\n";
+					text += "<b>" + evnt.Player.Name + "</b>: " + HighlightNames(FindEmoticons(evnt.Message)).Replace("\\", "\\\\") + "\n";
 				}
 				else if (eventArgs is ServerCommandEventArgs<CenterPrint>)
 				{
@@ -102,7 +96,7 @@ namespace q2Tool
 			}
 		}
 
-		private string highlightNames(string message)
+		private string HighlightNames(string message)
 		{
 			foreach (var player in GetPlugin<PAction>().Players)
 				message = message.Replace(player.Name, string.Format("<b>{0}</b>", player.Name));
@@ -110,7 +104,7 @@ namespace q2Tool
 			return message;
 		}
 
-		private string findEmoticons(string msg)
+		private static string FindEmoticons(string msg)
 		{
 			var emoticons = new Dictionary<string, string>
 			{
@@ -130,17 +124,17 @@ namespace q2Tool
 
 		void AddToBuffer(EventArgs text)
 		{
-			int prev = last - 1;
+			int prev = _last - 1;
 			if (prev < 0)
 				prev += BufferSize;
 
-			if (DecodeEvent(console_buffer[prev]) != DecodeEvent(text))
+			if (DecodeEvent(_consoleBuffer[prev]) != DecodeEvent(text))
 			{
-				console_buffer[last] = text;
-				int next = (last + 1) % BufferSize;
-				if (next == initial)
-					initial = (initial + 1) % BufferSize;
-				last = next;
+				_consoleBuffer[_last] = text;
+				int next = (_last + 1) % BufferSize;
+				if (next == _initial)
+					_initial = (_initial + 1) % BufferSize;
+				_last = next;
 			}
 		}
 
@@ -148,19 +142,19 @@ namespace q2Tool
 		{
 			e.Response.Connection.Type = ConnectionType.Close;
 
-			StringBuilder html = new StringBuilder();
+			var html = new StringBuilder();
 
 			switch (e.Request.Uri.LocalPath)
 			{
 				case "/get":
 					html.Append("[");
 					bool first = true;
-					int i = last;
-					while (i != initial)
+					int i = _last;
+					while (i != _initial)
 					{
 						i = (i <= 0 ? BufferSize : i) - 1;
 						if (first) first = false; else html.Append(",");
-						html.Append("\"" + DecodeEvent(console_buffer[i]) + "\"");
+						html.Append("\"" + DecodeEvent(_consoleBuffer[i]) + "\"");
 					}
 					html.Append("]");
 					break;
@@ -188,7 +182,8 @@ namespace q2Tool
 						var output = '';
 						for(var i = 0; i <= data.length; i++)
 							if(data[i]) output += data[i];
-						$('#content').html(output);
+						if($('#content').html() != output)
+							$('#content').html(output);
 						$.timer(1000,update);
 					}
 				});

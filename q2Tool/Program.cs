@@ -29,21 +29,18 @@ namespace q2Tool
 						Process.Start("Update.exe", "--wait-process q2Tool --auto-execute \"q2Tool.exe\"");
 						return;
 					}
-					else
+					EnableOnlyPlugins(updater);
+					var pluginFiles = updater.GetUpdateFileList();
+					if (pluginFiles.Count > 0)
 					{
-						EnableOnlyPlugins(updater);
-						var pluginFiles = updater.GetUpdateFileList();
-						if (pluginFiles.Count > 0)
+						Console.Write("Downloading plugins..");
+						foreach (var plugin in pluginFiles)
 						{
-							Console.Write("Downloading plugins..");
-							foreach (var plugin in pluginFiles)
-							{
-								Console.Write(".");
-								updater.DownloadFile(plugin);
-							}
+							Console.Write(".");
+							updater.DownloadFile(plugin);
 						}
-						Console.WriteLine("OK");
 					}
+					Console.WriteLine("OK");
 				}
 
 				LoadPlugins();

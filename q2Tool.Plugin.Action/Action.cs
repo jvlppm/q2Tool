@@ -14,6 +14,7 @@ namespace q2Tool
 		public abstract event ConnectedToServerEventHandler OnConnectedToServer;
 		public abstract event PlayerChangeNameEventHandler OnPlayerChangeName;
 		public abstract event PlayerEventHandler OnPlayerDisconnected;
+		public abstract event PlayerDiedEventHandler OnPlayerDied;
 
 		public Player GetPlayerByName(string name)
 		{
@@ -48,6 +49,8 @@ namespace q2Tool
 		public override event ConnectedToServerEventHandler OnConnectedToServer;
 		public override event PlayerChangeNameEventHandler OnPlayerChangeName;
 		public override event PlayerEventHandler OnPlayerDisconnected;
+		public override event PlayerDiedEventHandler OnPlayerDied;
+
 
 		Dictionary<int, Player> _newPlayersById;
 
@@ -90,7 +93,7 @@ namespace q2Tool
 		{
 			if (!PlayersById.ContainsKey(id))
 			{
-				Player player = new Player(name, id);
+				var player = new Player(name, id);
 				PlayersById.Add(id, player);
 			}
 			else if (PlayersById[id].Name != name)
@@ -158,6 +161,20 @@ namespace q2Tool
 			{
 				if (OnServerMessage != null)
 					OnServerMessage(this, new ServerMessageEventArgs(e.Command.Message, e.Command.Level));
+				foreach (var player in Players)
+				{
+					if(e.Command.Message.StartsWith(player.Name))
+					{
+						string messageEnd = e.Command.Message.Substring(player.Name.Length);
+
+						Player killer = Players.OrderByDescending(p => p.Name.Length)
+							.Where(p => messageEnd.Contains(p.Name))
+							.FirstOrDefault() ?? player;
+
+						if (OnPlayerDied != null)
+							OnPlayerDied(this, new PlayerDiedEventArgs(player, killer));
+					}
+				}
 			}
 			else
 			{
