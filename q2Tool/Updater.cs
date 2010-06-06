@@ -14,6 +14,7 @@ namespace Update
 		public string Hash { get; set; }
 		public long Size { get; set; }
 		public string Path { get; set; }
+		public string Zip { get; set; }
 		public bool CheckUpdates { get; set; }
 	}
 
@@ -71,11 +72,14 @@ namespace Update
 			{
 				throw new Exception(string.Format("File could not be downloaded: \"{0}\"", file), ex);
 			}
+
+			if (file.EndsWith(".zip"))
+				Zip.UnZipFile(file, true);
 		}
 
 		public List<string> GetUpdateFileList()
 		{
-			List<string> files = new List<string>();
+			Dictionary<string, List<FileInfo>> files = new Dictionary<string, List<FileInfo>>();
 
 			foreach (FileInfo file in GetFileList())
 			{
@@ -85,11 +89,13 @@ namespace Update
 				if (File.Exists(file.Path) && (!file.CheckUpdates || ComputeHash(file.Path) == _serverFiles[file.Path].Hash))
 					continue;
 
-				
-				files.Add(file.Path);
+				if (!files.ContainsKey(file.Zip))
+					files.Add(file.Zip, new List<FileInfo>());
+
+				files[file.Zip].Add(file);
 			}
 
-			return files;
+			return UpdateFileList(files);
 		}
 		#endregion
 
@@ -118,6 +124,34 @@ namespace Update
 			return fileInfos;
 		}
 
+		List<string> UpdateFileList(Dictionary<string, List<FileInfo>> modules)
+		{
+			List<string> updateFiles = new List<string>();
+
+			foreach (var module in modules)
+			{
+				bool addZip = false;
+				if (!string.IsNullOrEmpty(module.Key))
+				{
+					long totalSize = 0;
+					foreach (var file in module.Value)
+						totalSize += _serverFiles[file.Path].Size;
+
+					if (totalSize > _serverFiles[module.Key].Size)
+						addZip = true;
+				}
+				if (addZip)
+					updateFiles.Add(module.Key);
+				else
+				{
+					foreach (var file in module.Value)
+						updateFiles.Add(file.Path);
+				}
+			}
+
+			return updateFiles;
+		}
+
 		static string ComputeHash(string path)
 		{
 			StringBuilder localHash = new StringBuilder();
@@ -140,7 +174,7 @@ namespace Update
 			return modules.ToList();
 		}
 
-		IEnumerable<FileInfo> GetFileList()
+		List<FileInfo> GetFileList()
 		{
 			List<FileInfo> files = new List<FileInfo>();
 
@@ -159,13 +193,19 @@ namespace Update
 			var moduleFiles = module.Descendants("File").Select(file => new FileInfo
 			{
 				Path = file.Attribute("Path").Value,
-				CheckUpdates = file.Attribute("CheckUpdates") != null ? bool.Parse(file.Attribute("CheckUpdates").Value) : true
+				CheckUpdates = file.Attribute("CheckUpdates") != null ? bool.Parse(file.Attribute("CheckUpdates").Value) : true,
+				Zip = module.Attribute("Zip") == null ? "" : module.Attribute("Zip").Value
 			});
 
-			foreach (var file in moduleFiles)
+			if (moduleFiles.Count() == 0 && module.Attribute("Zip") != null)
+				files.Add(new FileInfo { Path = module.Attribute("Zip").Value, Zip = "" });
+			else
 			{
-				if (file.Path == string.Empty || files.Contains(file)) continue;
-				files.Add(file);
+				foreach (var file in moduleFiles)
+				{
+					if (file.Path == string.Empty || files.Contains(file)) continue;
+					files.Add(file);
+				}
 			}
 
 			var dependencies = from dependency in _modules.Descendants("Dependency")
