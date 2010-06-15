@@ -2,18 +2,19 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{B4B6026B-BFF2-464A-A4FC-445561037A6D}</ProjectGuid>
+    <ProjectGuid>{C6BAF4D2-66E1-4E9E-A625-E5D00570BC37}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>q2Tool.Plugin.Action</RootNamespace>
-    <AssemblyName>q2Tool.Plugin.Action</AssemblyName>
+    <RootNamespace>q2Tool.Plugin.FixBinds</RootNamespace>
+    <AssemblyName>q2Tool.Plugin.FixBinds</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,7 +23,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\Release\</OutputPath>
@@ -30,29 +32,27 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Action.cs" />
-    <Compile Include="Connect.cs" />
-    <Compile Include="Player.cs" />
-    <Compile Include="PlayerChangeName.cs" />
-    <Compile Include="PlayerDied.cs" />
-    <Compile Include="PlayerDisconnected.cs" />
-    <Compile Include="PlayerMessage.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Round.cs" />
-    <Compile Include="ServerMessage.cs" />
+    <Compile Include="FixBinds.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\q2Tool.Plugin.Action\q2Tool.Plugin.Action.csproj">
+      <Project>{B4B6026B-BFF2-464A-A4FC-445561037A6D}</Project>
+      <Name>q2Tool.Plugin.Action</Name>
+    </ProjectReference>
     <ProjectReference Include="..\q2Tool\q2Tool.csproj">
       <Project>{FF54F892-6E51-47B7-B0A6-5CA8398FBD08}</Project>
       <Name>q2Tool</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Jv.Plugins">
+    <Reference Include="Jv.Plugins, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\Jv.Plugins.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

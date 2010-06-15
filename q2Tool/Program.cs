@@ -3,6 +3,8 @@ using Jv.Plugins;
 using System.Linq;
 using Update;
 using System.Diagnostics;
+using System.IO;
+using Jv.Threading;
 
 namespace q2Tool
 {
@@ -10,37 +12,74 @@ namespace q2Tool
 	{
 		static readonly Manager PluginManager = new Manager();
 
+		static void BackgroundUpdateCheck()
+		{
+			Parallel.Start(() =>
+			{
+				var updater = new Updater(Settings.ReadValue("Update", "UpdateUrl"));
+				if (MainUpdateRequired(updater))
+				{
+					Settings.WriteValue("Update", "CheckUpdates", "True");
+					return;
+				}
+				EnableOnlyPlugins(updater);
+				if (updater.GetUpdateFileList().Count > 0)
+					Settings.WriteValue("Update", "CheckUpdates", "Plugins");
+			});
+		}
+
 		public static void Main(string[] args)
 		{
 			try
 			{
-				if(!args.ToList().Contains("--disable-updates"))
+				if (!args.ToList().Contains("--disable-updates"))
 				{
-					var updater = new Updater(Settings.ReadValue("Update", "UpdateUrl"));
-
-					Console.Write("Checking updates...");
-					if (MainUpdateRequired(updater))
+					bool msgOk = false;
+					if (Settings.ReadValue("Update", "CheckUpdates") == "True" || Settings.ReadValue("Update", "CheckUpdates") == string.Empty)
 					{
-						Console.WriteLine("Update required!");
-						updater = new Updater(Settings.ReadValue("Update", "UpdaterUrl"));
-						foreach (var file in updater.GetUpdateFileList())
-							updater.DownloadFile(file);
+						msgOk = true;
+						Console.Write("Checking updates...");
+						var updater = new Updater(Settings.ReadValue("Update", "UpdateUrl"));
+						Settings.WriteValue("Update", "CheckUpdates", "Plugins");
 
-						Process.Start("Update.exe", "--wait-process q2Tool --auto-execute \"q2Tool.exe\"");
-						return;
-					}
-					EnableOnlyPlugins(updater);
-					var pluginFiles = updater.GetUpdateFileList();
-					if (pluginFiles.Count > 0)
-					{
-						Console.Write("Downloading plugins..");
-						foreach (var plugin in pluginFiles)
+						if (MainUpdateRequired(updater))
 						{
-							Console.Write(".");
-							updater.DownloadFile(plugin);
+							Console.WriteLine("Update required!");
+							updater = new Updater(Settings.ReadValue("Update", "UpdaterUrl"));
+							foreach (var file in updater.GetUpdateFileList())
+								updater.DownloadFile(file);
+
+							Process.Start("Update.exe", "--wait-process q2Tool --auto-execute \"q2Tool.exe\"");
+							return;
 						}
 					}
-					Console.WriteLine("OK");
+					if (Settings.ReadValue("Update", "CheckUpdates") == "Plugins")
+					{
+						if(!msgOk)
+							Console.Write("Checking updates...");
+						var updater = new Updater(Settings.ReadValue("Update", "UpdateUrl"));
+						Settings.WriteValue("Update", "CheckUpdates", "False");
+						EnableOnlyPlugins(updater);
+						var pluginFiles = updater.GetUpdateFileList();
+						if (pluginFiles.Count > 0)
+						{
+							Console.Write("Downloading plugins..");
+							foreach (var plugin in pluginFiles)
+							{
+								Console.Write(".");
+								updater.DownloadFile(plugin);
+							}
+						}
+						Console.WriteLine("OK");
+					}
+					else
+					{
+						BackgroundUpdateCheck();
+					}
+				}
+				else
+				{
+					BackgroundUpdateCheck();
 				}
 
 				LoadPlugins();
@@ -77,9 +116,22 @@ namespace q2Tool
 					}
 				}
 			}
+			catch (FileNotFoundException ex)
+			{
+				Settings.WriteValue("Update", "CheckUpdates", "True");
+				Console.WriteLine("O arquivo \"{0}\" não foi encontrado.", ex.FileName);
+				PluginManager.MessageToPlugin<PLog>(ex);
+			}
 			catch (Exception ex)
 			{
+				Settings.WriteValue("Update", "CheckUpdates", "True");
+				Exception inner = ex.InnerException;
 				Console.WriteLine("Error: {0}", ex.Message);
+				while (inner != null)
+				{
+					Console.WriteLine(inner.Message);
+					inner = inner.InnerException;
+				}
 				PluginManager.MessageToPlugin<PLog>(ex);
 			}
 		}

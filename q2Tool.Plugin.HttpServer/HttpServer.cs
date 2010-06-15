@@ -76,13 +76,13 @@ namespace q2Tool
 
 					if (evnt.Dead)
 						text += "[DEAD] ";
-					text += "<b>" + evnt.Player.Name + "</b>: " + HighlightNames(FindEmoticons(evnt.Message)).Replace("\\", "\\\\") + "\n";
+					text += "<b>" + evnt.Player.Name.Replace("<", "&lt;").Replace(">", "&gt;") + "</b>: " + HighlightNames(FindEmoticons(evnt.Message)).Replace("\\", "\\\\") + "\n";
 				}
 				else if (eventArgs is ServerCommandEventArgs<CenterPrint>)
 				{
 					var evnt = (ServerCommandEventArgs<CenterPrint>)eventArgs;
 					bold = true;
-					text = evnt.Command.Message.TrimEnd('\n', '\r') + "\n";
+					text = evnt.Command.Message.Replace("<", "&lt;").Replace(">", "&gt;").TrimEnd('\n', '\r') + "\n";
 				}
 
 				if (bold) text = "<b>" + text + "</b>";
@@ -99,7 +99,7 @@ namespace q2Tool
 		private string HighlightNames(string message)
 		{
 			foreach (var player in GetPlugin<PAction>().Players)
-				message = message.Replace(player.Name, string.Format("<b>{0}</b>", player.Name));
+				message = message.Replace(player.Name, string.Format("<b>{0}</b>", player.Name.Replace("<", "&lt;").Replace(">", "&gt;")));
 
 			return message;
 		}

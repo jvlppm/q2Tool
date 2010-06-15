@@ -7,6 +7,7 @@ namespace q2Tool
 {
 	public class ShowPlayer : Plugin
 	{
+		Client Client { get; set; }
 		readonly Dictionary<string, string> _skins;
 
 		public ShowPlayer()
@@ -19,7 +20,19 @@ namespace q2Tool
 			Quake.OnClientStringCmd += Quake_OnStringCmd;
 			Quake.OnServerPlayerInfo += Quake_OnPlayerInfo;
 			GetPlugin<PAction>().OnPlayerChangeName += ShowPlayer_OnPlayerChangeName;
-			GetPlugin<PAction>().OnConnectedToServer += UpdateSkins;
+			GetPlugin<PAction>().OnConnectedToServer += (connSender, connE) =>
+			{
+				if (Client == null)
+				{
+					Client = new Client(Quake, GetType().Name, GetPlugin<PAction>().CurrentPlayer.Name);
+					Client.OnReceiveMessage += (msgSender, msgE) =>
+					{
+						string[] players = msgE.Message.Split('\\');
+						Quake.SendToClient(new CenterPrint(string.Format("{0} is looking for {1}\n", players[0], players[1])));
+					};
+				}
+				UpdateSkins(connSender, connE);
+			};
 		}
 
 		void UpdateSkins(Action sender, System.EventArgs e)
@@ -76,6 +89,7 @@ namespace q2Tool
 							_skins.Add(player.Name, showSkin);
 						else
 							_skins[player.Name] = showSkin;
+						Client.SendMessage(GetPlugin<PAction>().CurrentPlayer.Name + "\\" + player.Name);
 					}
 				}
 

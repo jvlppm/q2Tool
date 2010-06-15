@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using q2Tool.Commands;
 using Jv.Networking;
+using System.IO;
+using Jv.Threading;
 
 namespace q2Tool
 {
@@ -18,9 +20,11 @@ namespace q2Tool
 		public const int MaxGeneral = MaxClients * 2;
 		#endregion
 
+		public static event EventHandler OnExit;
+
 		public string Directory { get; private set; }
 		public string Path { get; private set; }
-		public string Name { get; private set; }
+		public string ExeName { get; private set; }
 		public string CFG { get; set; }
 
 		public Quake(string path) : this(path, string.Empty) { }
@@ -33,7 +37,10 @@ namespace q2Tool
 			Path = path.Replace("\\", "/");
 			Directory = Path.Substring(0, Path.LastIndexOf('/') + 1);
 
-			Name = name == string.Empty ? Path.Substring(Path.LastIndexOf('/') + 1, Path.Length - 5 - Path.LastIndexOf('/')) : name;
+			if (!File.Exists(path))
+				throw new FileNotFoundException("Quake 2 executable file not found", path);
+
+			ExeName = name == string.Empty ? Path.Substring(Path.LastIndexOf('/') + 1, Path.Length - 5 - Path.LastIndexOf('/')) : name;
 
 			#region CreateProxy
 			_fakeServerCommands = new Queue<IServerCommand>();
@@ -84,7 +91,7 @@ namespace q2Tool
 				catch (System.Net.Sockets.SocketException) { }
 			}while(!proxyStarted);
 
-			foreach (var process in Process.GetProcessesByName(Name))
+			foreach (var process in Process.GetProcessesByName(ExeName))
 				process.Close();
 			
 			var launchEventArgs = new GameLaunchEventArgs();
@@ -93,7 +100,13 @@ namespace q2Tool
 			                              "+set game action " + launchEventArgs.CustomArgs +
 			                              (CFG != string.Empty ? " +exec " + CFG : "") + " +connect " + Client.EndPoint)
 			         	{WorkingDirectory = Directory};
-			Process.Start(pi);
+			var q2 = Process.Start(pi);
+			Parallel.Start("Wait Quake exit", () =>
+			{
+				q2.WaitForExit();
+				if (OnExit != null)
+					OnExit(this, EventArgs.Empty);
+			});
 		}
 	}
 }

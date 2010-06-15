@@ -53,6 +53,7 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Client.cs" />
     <Compile Include="Game\Commands\Client\StringCmd.cs" />
     <Compile Include="Game\Commands\Client\UserInfo.cs" />
     <Compile Include="Game\Commands\Command.cs" />
@@ -144,6 +145,10 @@
     <Reference Include="Jv.Plugins, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\Jv.Plugins.dll</HintPath>
+    </Reference>
+    <Reference Include="Jv.Threading, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\Jv.Threading.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.XML" />
