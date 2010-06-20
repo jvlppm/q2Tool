@@ -6,10 +6,12 @@ namespace q2Tool
 	public class FixBinds : Plugin
 	{
 		public List<Player> Kills { get; set; }
+		public List<Player> HeadKills { get; set; }
 
 		public FixBinds()
 		{
 			Kills = new List<Player>();
+			HeadKills = new List<Player>();
 		}
 
 		protected override void OnGameStart()
@@ -17,76 +19,99 @@ namespace q2Tool
 			GetPlugin<PAction>().OnRoundBegin += delegate
 			{
 				Kills.Clear();
+				HeadKills.Clear();
 			};
 			GetPlugin<PAction>().OnPlayerDied += (s, e) =>
 			{
 				if (e.Killer == GetPlugin<PAction>().CurrentPlayer && GetPlugin<PAction>().RoundActive)
+				{
 					Kills.Add(e.Player);
+					if (e.Location == HitLocation.Head)
+						HeadKills.Add(e.Player);
+				}
 			};
 			Quake.OnClientStringCmd += (s, e) =>
 			{
-				string p = e.Command.Message;
-				if (p.Contains("%k") || p.Contains("%K"))
+				string toRead = e.Command.Message;
+				string finalMessage = string.Empty;
+				bool ignore = false;
+
+				do
 				{
-					if (Kills.Count == 0)
-						p = string.Empty;
-					else
+					int pos = toRead.IndexOf("%");
+					if (pos >= 0)
 					{
-						int pos = 0, testPos;
+						int endPos = pos;
+						while (endPos < toRead.Length && toRead[endPos] != ' ') endPos++;
+						while (pos >= 0 && toRead[pos] != ' ') pos--;
 
-						testPos = p.IndexOf("%k", pos);
-						if (testPos < 0 || testPos > p.IndexOf("%K", pos) && p.IndexOf("%K") >= 0)
-							pos = p.IndexOf("%K", pos);
-						else
-							pos = testPos;
+						string beggining = toRead.Substring(0, pos + 1);
+						string variable = toRead.Substring(pos + 1, endPos - (pos + 1));
+						string value = GetVariableValue(variable);
 
-						while (pos >= 0)
+						if (value == string.Empty)
 						{
-							int i, j;
-							for (i = pos - 1; i >= 0 && (char.IsLetterOrDigit(p, i) || p[i] == '_'); i--) ;
-							for (j = pos + 2; j < p.Length && (char.IsLetterOrDigit(p, j) || p[j] == '_'); j++) ;
-
-							string prefix = string.Empty, suffix = string.Empty;
-							if (i >= 0)
-								prefix = p.Substring(i + 1, pos - 1 - i);
-							if (j < p.Length)
-								suffix = p.Substring(pos + 2, j - pos - 2);
-
-							string players = GetKilledPlayers(prefix, suffix, p[pos + 1] == 'K');
-
-							p = p.Substring(0, pos - prefix.Length) +
-												players +
-												p.Substring(pos + 2 + suffix.Length);
-							pos = i + players.Length;
-
-							testPos = p.IndexOf("%k", pos);
-							if (testPos < 0 || testPos > p.IndexOf("%K", pos) && p.IndexOf("%K") >= 0)
-								pos = p.IndexOf("%K", pos);
-							else
-								pos = testPos;
+							ignore = true;
+							break;
 						}
 
-						Kills.Clear();
+						finalMessage += beggining + value;
+						toRead = toRead.Substring(endPos);
 					}
-				}
-				e.Command.Message = p;
+					else
+					{
+						finalMessage += toRead;
+						break;
+					}
+				} while (toRead != string.Empty);
+
+				if (ignore)
+					e.Command.Message = string.Empty;
+				else
+					e.Command.Message = finalMessage; 
 			};
 		}
 
-		string GetKilledPlayers(string prefix, string suffix, bool upper)
+		private string GetVariableValue(string variable)
+		{
+			int pos = variable.IndexOf("%");
+
+			if (pos + 2 >= variable.Length)
+				return variable;
+
+			string prefix = variable.Substring(0, pos);
+			string suffix = variable.Substring(pos + 3);
+			string cmd = variable.Substring(pos+1, 2);
+
+			bool upper = cmd.ToUpper() == cmd;
+
+			switch (cmd.ToUpper())
+			{
+				case "KH":
+					return GetKilledPlayers(HeadKills, prefix, suffix, upper);
+				case "KA":
+					return GetKilledPlayers(Kills, prefix, suffix, upper);
+				default:
+					return variable;
+			}
+		}
+
+		string GetKilledPlayers(List<Player> playersList, string prefix, string suffix, bool upper)
 		{
 			prefix = prefix.Replace("_", " ");
 			suffix = suffix.Replace("_", " ");
 			int i;
 			string players = prefix;
-			for (i = 0; i < Kills.Count - 2; i++)
-				players += FixName(Kills[i].Name, upper) + suffix + ", " + prefix;
-			for (; i < Kills.Count - 1; i++)
-				players += FixName(Kills[i].Name, upper) + suffix + " e " + prefix;
+			for (i = 0; i < playersList.Count - 2; i++)
+				players += FixName(playersList[i].Name, upper) + suffix + ", " + prefix;
+			for (; i < playersList.Count - 1; i++)
+				players += FixName(playersList[i].Name, upper) + suffix + " e " + prefix;
 
-			if (i < Kills.Count)
-				players += FixName(Kills[i].Name, upper) + suffix;
+			if (i < playersList.Count)
+				players += FixName(playersList[i].Name, upper) + suffix;
 
+			if (players == prefix)
+				return string.Empty;
 			return players;
 		}
 
