@@ -82,7 +82,7 @@ namespace q2Tool
 			Quake.OnServerData += Quake_OnServerData;
 			Quake.OnServerPrint += Quake_OnServerPrint;
 			Quake.OnServerCenterPrint += Quake_OnServerCenterPrint;
-			Quake.OnServerPlayerInfo += (s, e) => AddPlayer(e.Command.Id, e.Command.Name);
+			Quake.OnServerPlayerInfo += (s, e) => AddPlayer(e.Command.Id, e.Command.Name, e);
 			OnServerMessage += Action_OnServerMessage;
 		}
 
@@ -114,7 +114,7 @@ namespace q2Tool
 			}
 		}
 
-		void AddPlayer(int id, string name)
+		void AddPlayer(int id, string name, ServerCommandEventArgs<PlayerInfo> e)
 		{
 			if (!PlayersById.ContainsKey(id))
 			{
@@ -126,7 +126,7 @@ namespace q2Tool
 				string oldName = PlayersById[id].Name;
 				PlayersById[id].Name = name;
 				if (OnPlayerChangeName != null)
-					OnPlayerChangeName(this, new PlayerChangeNameEventArgs(oldName, PlayersById[id]));
+					OnPlayerChangeName(this, new PlayerChangeNameEventArgs(oldName, PlayersById[id], e));
 			}
 		}
 

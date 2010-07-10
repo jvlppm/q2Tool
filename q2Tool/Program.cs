@@ -16,15 +16,21 @@ namespace q2Tool
 		{
 			Parallel.Start(() =>
 			{
-				var updater = new Updater(Settings.ReadValue("Update", "UpdateUrl"));
-				if (MainUpdateRequired(updater))
+				try
 				{
-					Settings.WriteValue("Update", "CheckUpdates", "True");
-					return;
+					var updater = new Updater(Settings.ReadValue("Update", "UpdateUrl"));
+					if (MainUpdateRequired(updater))
+					{
+						Settings.WriteValue("Update", "CheckUpdates", "True");
+						return;
+					}
+					EnableOnlyPlugins(updater);
+					if (updater.GetUpdateFileList().Count > 0)
+						Settings.WriteValue("Update", "CheckUpdates", "Plugins");
 				}
-				EnableOnlyPlugins(updater);
-				if (updater.GetUpdateFileList().Count > 0)
-					Settings.WriteValue("Update", "CheckUpdates", "Plugins");
+				catch
+				{
+				}
 			});
 		}
 

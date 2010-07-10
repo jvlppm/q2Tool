@@ -16,7 +16,8 @@ namespace q2Tool
 			Data = data;
 
 			Id = ReadInt();
-			Ack = ReadInt();
+			if (Id != -1)
+				Ack = ReadInt();
 		}
 
 		public RawPackage(int size)
