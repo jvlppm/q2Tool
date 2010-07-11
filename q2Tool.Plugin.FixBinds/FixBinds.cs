@@ -194,7 +194,7 @@ namespace q2Tool
 			if (final.Length <= current.Length)
 				final = current;
 
-			if (final == string.Empty || final.Length < bigger.Length / 2)
+			if (final == string.Empty || final.Length <= bigger.Length / 2)
 				final = bigger;
 
 			if (upper)
