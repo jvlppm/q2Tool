@@ -40,6 +40,7 @@ namespace q2Tool
 		public event ClientCommandEventHandler<IClientStringPackage> OnClientStringPackage;
 		public event ClientCommandEventHandler<StringCmd> OnClientStringCmd;
 		public event ClientCommandEventHandler<UserInfo> OnClientUserInfo;
+		public event ClientCommandEventHandler<Setting> OnClientSetting;
 		#endregion
 		#endregion
 
@@ -72,6 +73,9 @@ namespace q2Tool
 					case ClientCommand.UserInfo:
 						OnClientUserInfo.Fire(this, (UserInfo)cmd);
 						OnClientStringPackage.Fire(this, (IClientStringPackage)cmd);
+						break;
+					case ClientCommand.Setting:
+						OnClientSetting.Fire(this, (Setting)cmd);
 						break;
 				}
 			}

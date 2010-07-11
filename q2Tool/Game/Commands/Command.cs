@@ -6,9 +6,10 @@
 		Nop = 0x01,
 
 		Move = 0x02,				// [[usercmd_t]
-		UserInfo = 0x03,			// [[userinfo string]
+		UserInfo = 0x03,			// [string userinfo]
 		StringCmd = 0x04,			// [string message]
-		Setting = 0x05				// [setting][value] R1Q2 settings support.
+		Setting = 0x05,				// [short setting, short value] R1Q2 settings support.
+		MultiMoves = 0x06
 	}
 
 	public enum ServerCommand : byte

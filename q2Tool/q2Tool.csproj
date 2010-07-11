@@ -54,6 +54,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Client.cs" />
+    <Compile Include="Game\Commands\Client\Setting.cs" />
     <Compile Include="Game\Commands\Client\StringCmd.cs" />
     <Compile Include="Game\Commands\Client\UserInfo.cs" />
     <Compile Include="Game\Commands\Command.cs" />
