@@ -136,7 +136,8 @@ namespace q2Tool
 
 		static string FixName(string name, bool upper)
 		{
-			name = name.ToLower();
+			var separators = new List<char> { '^', '.', '-', '[', ']', '(', ')', '*', '=' };
+
 			int pontos = 0;
 			for (int i = 0; i < name.Length; i++)
 			{
@@ -146,39 +147,59 @@ namespace q2Tool
 
 			name = pontos > 2 ? name.Replace(".", "") : name.Trim('.', '^', '_');
 
-			string[] words = name.Split('^', '.', '-', '[', ']', '(', ')', '*');
-			string biggest = words[0];
+			string[] words = name.Split(separators.ToArray());
+			string bigger = words[0];
 
 			foreach (string word in words)
 			{
-				if (biggest.Length < word.Length)
-					biggest = word;
+				if (bigger.Length <= word.Length)
+					bigger = word;
 			}
 
-			biggest = biggest.Trim('!');
+			bigger = bigger.Trim('!');
 
-			if (!biggest.Contains('2') && !biggest.Contains('8') && !biggest.Contains('9'))
+			if (!bigger.Contains('2') && !bigger.Contains('8') && !bigger.Contains('9'))
 			{
-				biggest = biggest.Replace('0', 'o');
-				biggest = biggest.Replace('1', 'i');
-				biggest = biggest.Replace('3', 'e');
-				biggest = biggest.Replace('4', 'a');
-				biggest = biggest.Replace('!', 'i');
-				biggest = biggest.Replace('@', 'a');
-				biggest = biggest.Replace('5', 's');
-				biggest = biggest.Replace('6', 'g');
-				biggest = biggest.Replace('7', 't');
+				bigger = bigger.Replace('0', 'o');
+				bigger = bigger.Replace('1', 'i');
+				bigger = bigger.Replace('3', 'e');
+				bigger = bigger.Replace('4', 'a');
+				bigger = bigger.Replace('!', 'i');
+				bigger = bigger.Replace('@', 'a');
+				bigger = bigger.Replace('5', 's');
+				bigger = bigger.Replace('6', 'g');
+				bigger = bigger.Replace('7', 't');
 			}
 
 			//if(!biggest.Contains("you"))
 			//	biggest = biggest.Replace("ou", "o");
 
-			if (biggest == string.Empty)
-				biggest = name;
+			if (bigger == string.Empty)
+				bigger = name;
+
+			string final = string.Empty;
+			string current = string.Empty;
+			for (int i = 0; i < bigger.Length; i++)
+			{
+				if (char.IsUpper(bigger[i]))
+				{
+					if (final.Length <= current.Length)
+						final = current;
+
+					current = bigger[i].ToString();
+				}
+				else current += bigger[i];
+			}
+
+			if (final.Length <= current.Length)
+				final = current;
+
+			if (final == string.Empty || final.Length < bigger.Length / 2)
+				final = bigger;
 
 			if (upper)
-				return biggest.ToUpper();
-			return biggest;
+				return final.ToUpper();
+			return final.ToLower();
 		}
 	}
 }
