@@ -8,7 +8,7 @@ namespace q2Tool
 
 		public RawClientPackage(byte[] data) : base(data)
 		{
-			if (Id != -1)
+			//if (Id != -1)
 				QPort = ReadByte();
 		}
 
