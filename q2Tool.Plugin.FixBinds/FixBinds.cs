@@ -136,7 +136,7 @@ namespace q2Tool
 
 		static string FixName(string name, bool upper)
 		{
-			var separators = new List<char> { '^', '.', '-', '[', ']', '(', ')', '*', '=' };
+			var separators = new List<char> { '^', '.', '-', '[', ']', '(', ')', '*', '=', ':', '<', '>' };
 
 			int pontos = 0;
 			for (int i = 0; i < name.Length; i++)
@@ -181,9 +181,9 @@ namespace q2Tool
 			string current = string.Empty;
 			for (int i = 0; i < bigger.Length; i++)
 			{
-				if (char.IsUpper(bigger[i]))
+				if (char.IsUpper(bigger[i]) && i + 1 < bigger.Length && char.IsLower(bigger[i + 1]))
 				{
-					if (final.Length <= current.Length)
+					if (final.Length < current.Length)
 						final = current;
 
 					current = bigger[i].ToString();
@@ -191,10 +191,10 @@ namespace q2Tool
 				else current += bigger[i];
 			}
 
-			if (final.Length <= current.Length)
+			if (final.Length < current.Length)
 				final = current;
 
-			if (final == string.Empty || final.Length <= bigger.Length / 2)
+			if (final == string.Empty || final.Length <= 3)
 				final = bigger;
 
 			if (upper)
