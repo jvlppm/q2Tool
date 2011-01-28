@@ -136,7 +136,7 @@ namespace q2Tool
 
 		static string FixName(string name, bool upper)
 		{
-			var separators = new List<char> { '^', '.', '-', '[', ']', '(', ')', '*', '=', ':', '<', '>' };
+			var separators = new List<char> { '^', '.', '-', '[', ']', '(', ')', '*', '=', ':', '<', '>', ' ' };
 
 			int pontos = 0;
 			for (int i = 0; i < name.Length; i++)
@@ -152,8 +152,9 @@ namespace q2Tool
 
 			foreach (string word in words)
 			{
-				if (bigger.Length <= word.Length)
-					bigger = word;
+				string part = word.Trim();
+				if (bigger.Length <= part.Length)
+					bigger = part;
 			}
 
 			bigger = bigger.Trim('!');
