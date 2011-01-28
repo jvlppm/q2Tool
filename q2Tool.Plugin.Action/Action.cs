@@ -89,6 +89,13 @@ namespace q2Tool
 		void Quake_OnServerData(Quake sender, ServerCommandEventArgs<ServerData> e)
 		{
 			_playerNum = e.Command.PlayerNum;
+			Quake.OnServerPrint += Quake_OnFirstServerPrint;
+		}
+
+		void Quake_OnFirstServerPrint(Quake sender, ServerCommandEventArgs<Print> e)
+		{
+			UpdatePlayerList();
+			Quake.OnServerPrint -= Quake_OnFirstServerPrint;
 		}
 
 		void Action_OnServerMessage(Action sender, ServerMessageEventArgs e)
