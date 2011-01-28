@@ -16,7 +16,7 @@ namespace q2Tool
 			Data = data;
 
 			Id = ReadInt();
-			//if (Id != -1)
+			if (Id != -1)
 				Ack = ReadInt();
 		}
 

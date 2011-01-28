@@ -44,10 +44,12 @@ namespace q2Tool
 		#endregion
 		#endregion
 
+		ServerData ServerData;
+
 		#region Fire events for each connection command
 		void ParseClientData(IProxy sender, MessageEventArgs e)
 		{
-			var outcomingData = new RawClientPackage(e.Data);
+			var outcomingData = new RawClientPackage(e.Data, ServerData != null? ServerData.Protocol : ServerData.ServerProtocol.R1Q2);
 			if (outcomingData.Id == _lastSentMessageId) return;
 			
 			_lastSentMessageId = outcomingData.Id;
@@ -80,7 +82,7 @@ namespace q2Tool
 				}
 			}
 
-			var finalPackage = new RawClientPackage(_lastSentMessageId, outcomingData.Ack, outcomingData.QPort, package);
+			var finalPackage = new RawClientPackage(_lastSentMessageId, outcomingData.Ack, outcomingData.QPort, package, ServerData != null? ServerData.Protocol : Commands.Server.ServerData.ServerProtocol.R1Q2);
 			e.Data = finalPackage.Data;
 		}
 
@@ -105,6 +107,7 @@ namespace q2Tool
 				switch (cmd.Type)
 				{
 					case ServerCommand.ServerData:
+						ServerData = (ServerData)cmd;
 						OnServerData.Fire(this, (ServerData)cmd);
 						break;
 
