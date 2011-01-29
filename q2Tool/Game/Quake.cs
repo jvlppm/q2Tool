@@ -89,24 +89,29 @@ namespace q2Tool
 					proxyStarted = true;
 				}
 				catch (System.Net.Sockets.SocketException) { }
-			}while(!proxyStarted);
+			} while (!proxyStarted);
 
 			foreach (var process in Process.GetProcessesByName(ExeName))
 				process.Close();
-			
+
 			var launchEventArgs = new GameLaunchEventArgs();
 
 			var pi = new ProcessStartInfo(Path,
-			                              "+set game action " + launchEventArgs.CustomArgs +
-			                              (CFG != string.Empty ? " +exec " + CFG : "") + " +connect " + Client.EndPoint)
-			         	{WorkingDirectory = Directory};
-			var q2 = Process.Start(pi);
-			Parallel.Start("Wait Quake exit", () =>
+										  "+set game action " + launchEventArgs.CustomArgs +
+										  (CFG != string.Empty ? " +exec " + CFG : "") + " +connect " + Client.EndPoint) { WorkingDirectory = Directory };
+			var q2 = new Process
 			{
-				q2.WaitForExit();
+				EnableRaisingEvents = true,
+				StartInfo = pi
+			};
+
+			q2.Exited += delegate
+			{
 				if (OnExit != null)
 					OnExit(this, EventArgs.Empty);
-			});
+			};
+
+			q2.Start();
 		}
 	}
 }

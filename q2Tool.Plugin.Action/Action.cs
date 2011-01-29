@@ -44,7 +44,7 @@ namespace q2Tool
 
 	public class Action : PAction
 	{
-		bool _connected, _roundActive;
+		bool _roundActive;
 
 		public override event PlayerMessageEventHandler OnPlayerMessage;
 		public override event ServerMessageEventHandler OnServerMessage;
@@ -70,7 +70,6 @@ namespace q2Tool
 			}
 		}
 
-		Dictionary<int, Player> _newPlayersById;
 		int _playerNum;
 
 		public Action()
@@ -84,18 +83,22 @@ namespace q2Tool
 			Quake.OnServerCenterPrint += Quake_OnServerCenterPrint;
 			Quake.OnServerPlayerInfo += (s, e) => AddPlayer(e.Command.Id, e.Command.Name, e);
 			OnServerMessage += Action_OnServerMessage;
+
+			Quake.OnServerPrint += Quake_Connected;
+		}
+
+		void Quake_Connected(Quake sender, ServerCommandEventArgs<Print> e)
+		{
+			if (OnConnectedToServer != null)
+			{
+				OnConnectedToServer(this, EventArgs.Empty);
+				Quake.OnServerPrint -= Quake_Connected;
+			}
 		}
 
 		void Quake_OnServerData(Quake sender, ServerCommandEventArgs<ServerData> e)
 		{
 			_playerNum = e.Command.PlayerNum;
-			Quake.OnServerPrint += Quake_OnFirstServerPrint;
-		}
-
-		void Quake_OnFirstServerPrint(Quake sender, ServerCommandEventArgs<Print> e)
-		{
-			UpdatePlayerList();
-			Quake.OnServerPrint -= Quake_OnFirstServerPrint;
 		}
 
 		void Action_OnServerMessage(Action sender, ServerMessageEventArgs e)
@@ -117,7 +120,6 @@ namespace q2Tool
 					if (OnPlayerDisconnected != null)
 						OnPlayerDisconnected(this, new PlayerEventArgs(player));
 				}
-				else UpdatePlayerList();
 			}
 		}
 
@@ -134,51 +136,6 @@ namespace q2Tool
 				PlayersById[id].Name = name;
 				if (OnPlayerChangeName != null)
 					OnPlayerChangeName(this, new PlayerChangeNameEventArgs(oldName, PlayersById[id], e));
-			}
-		}
-
-		void UpdatePlayerList()
-		{
-			_newPlayersById = new Dictionary<int, Player>();
-
-			Quake.OnServerPrint += GetPlayerList;
-			Quake.ExecuteCommand("stats list");
-		}
-
-		void GetPlayerList(Quake sender, CommandEventArgs<Print> e)
-		{
-			string message = e.Command.Message;
-			if (e.Command.Message.StartsWith(" "))
-			{
-				message = message.Trim(' ');
-				int playerNumber = int.Parse(message.Substring(0, message.IndexOf(' ')));
-				message = message.Substring(message.IndexOf(' ')).Trim(' ');
-				string playerName = message.Substring(0, message.LastIndexOf(' ')).Trim(' ');
-				
-				Player newPlayer = GetPlayerByName(playerName);
-				if (newPlayer == null || newPlayer.Id < 0) newPlayer = new Player(playerName, playerNumber);
-				_newPlayersById.Add(playerNumber, newPlayer);
-
-				e.Command.Message = null;
-			}
-			else if (message == "PlayerID  Name                  Accuracy\n")
-				e.Command.Message = null;
-			else if (message == "\n  Use \"stats <PlayerID>\" for\n  individual stats\n\n")
-			{
-				e.Command.Message = null;
-				Quake.OnServerPrint -= GetPlayerList;
-
-				PlayersById = _newPlayersById;
-
-				if (OnConnectedToServer != null && !_connected)
-					OnConnectedToServer(this, EventArgs.Empty);
-
-				_connected = true;
-				_newPlayersById = null;
-			}
-			else if(message.StartsWith("\n"))
-			{
-				e.Command.Message = null;
 			}
 		}
 
@@ -206,15 +163,7 @@ namespace q2Tool
 			}
 			else
 			{
-				if (message.StartsWith("console: "))
-				{
-					if (message.Contains("Welcome to "))
-					{
-						_connected = false;
-						UpdatePlayerList();
-					}
-				}
-				else if (OnPlayerMessage != null)
+				if (OnPlayerMessage != null)
 				{
 					bool dead = false;
 					if (message.StartsWith("[DEAD] "))
