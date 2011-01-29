@@ -34,6 +34,8 @@ namespace q2Tool
 		public event ServerCommandEventHandler<StuffText> OnServerStuffText;
 		public event ServerCommandEventHandler<ConfigString> OnServerConfigString;
 		public event ServerCommandEventHandler<PlayerInfo> OnServerPlayerInfo;
+		public event ServerCommandEventHandler<Layout> OnServerLayout;
+		public event ServerCommandEventHandler<Disconnect> OnServerDisconnect;
 		#endregion
 		#region Client
 		public event ConnectionPackageEventHandler<IClientCommand> OnClientPackage;
@@ -142,6 +144,14 @@ namespace q2Tool
 			{
 				switch (cmd.Type)
 				{
+					case ServerCommand.Disconnect:
+						OnServerDisconnect.Fire(this, (Disconnect)cmd);
+						break;
+
+					case ServerCommand.Layout:
+						OnServerLayout.Fire(this, (Layout)cmd);
+						break;
+
 					case ServerCommand.ServerData:
 						OnServerData.Fire(this, (ServerData)cmd);
 						break;
