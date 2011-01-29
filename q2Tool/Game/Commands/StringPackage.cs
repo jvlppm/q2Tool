@@ -1,4 +1,5 @@
 ﻿using q2Tool.Commands;
+using Jv.Networking;
 
 namespace q2Tool
 {
@@ -15,7 +16,7 @@ namespace q2Tool
 		public string Message { get; set; }
 
 		//[string message]
-		public StringPackage(byte code, RawPackage data)
+        public StringPackage(byte code, RawData data)
 		{
 			Message = data.ReadString();
 			TypeCode = code;
@@ -34,7 +35,7 @@ namespace q2Tool
 			return Message.Length + 2;
 		}
 
-		public void WriteTo(RawPackage data)
+        public void WriteTo(RawData data)
 		{
 			if (string.IsNullOrEmpty(Message))
 				return;

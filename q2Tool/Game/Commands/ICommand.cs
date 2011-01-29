@@ -1,9 +1,11 @@
-﻿namespace q2Tool.Commands
+﻿using Jv.Networking;
+
+namespace q2Tool.Commands
 {
 	public interface ICommand
 	{
 		int Size();
-		void WriteTo(RawPackage package);
+		void WriteTo(RawData package);
 	}
 
 	public interface IServerCommand : ICommand

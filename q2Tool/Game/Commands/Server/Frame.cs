@@ -1,10 +1,11 @@
 using System;
+using Jv.Networking;
 
 namespace q2Tool.Commands.Server
 {
 	public class Frame : IServerCommand
 	{
-		public Frame(RawPackage serverPackage, int extrabits)
+        public Frame(RawData serverPackage, int extrabits)
 		{
 			throw new NotImplementedException();
 		}
@@ -15,7 +16,7 @@ namespace q2Tool.Commands.Server
 			throw new NotImplementedException();
 		}
 
-		public void WriteTo(RawPackage data)
+        public void WriteTo(RawData data)
 		{
 			throw new NotImplementedException();
 		}

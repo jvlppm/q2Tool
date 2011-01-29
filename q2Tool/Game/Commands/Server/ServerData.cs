@@ -1,4 +1,5 @@
 using System;
+using Jv.Networking;
 
 namespace q2Tool.Commands.Server
 {
@@ -23,7 +24,7 @@ namespace q2Tool.Commands.Server
 		public byte Unknown { get; private set; }
 
 		//[int protocol][int serverCount][byte attractLoop][string gameDir][string levelName] ...
-		public ServerData(RawPackage serverPackage)
+        public ServerData(RawData serverPackage)
 		{
 			Protocol = (ServerProtocol) serverPackage.ReadInt();
 			ServerCount = serverPackage.ReadInt();
@@ -70,7 +71,7 @@ namespace q2Tool.Commands.Server
 			return size;
 		}
 
-		public void WriteTo(RawPackage data)
+        public void WriteTo(RawData data)
 		{
 			data.WriteByte((byte)Type);
 			data.WriteInt((int)Protocol);

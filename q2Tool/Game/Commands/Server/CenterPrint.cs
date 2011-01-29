@@ -1,11 +1,12 @@
-﻿namespace q2Tool.Commands.Server
+﻿using Jv.Networking;
+namespace q2Tool.Commands.Server
 {
 	public class CenterPrint : IServerCommand, IServerStringPackage
 	{
 		public string Message { get; set; }
 
 		//[string message]
-		public CenterPrint(RawPackage data)
+        public CenterPrint(RawData data)
 		{
 			Message = data.ReadString();
 		}
@@ -22,7 +23,7 @@
 			return Message.Length + 2;
 		}
 
-		public void WriteTo(RawPackage data)
+        public void WriteTo(RawData data)
 		{
 			if (string.IsNullOrEmpty(Message))
 				return;

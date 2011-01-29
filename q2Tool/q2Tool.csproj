@@ -73,9 +73,6 @@
     <Compile Include="Game\Package.cs" />
     <Compile Include="Game\Proxy.cs" />
     <Compile Include="Game\Quake.cs" />
-    <Compile Include="Game\RawPackage\RawClientPackage.cs" />
-    <Compile Include="Game\RawPackage\RawPackage.cs" />
-    <Compile Include="Game\RawPackage\RawServerPackage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Plugin.cs" />

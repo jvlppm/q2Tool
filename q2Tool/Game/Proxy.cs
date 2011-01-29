@@ -44,15 +44,34 @@ namespace q2Tool
 		#endregion
 		#endregion
 
-		ServerData ServerData;
+		ServerData.ServerProtocol Protocol;
 
 		#region Fire events for each connection command
 		void ParseClientData(IProxy sender, MessageEventArgs e)
 		{
-			var outcomingData = new RawClientPackage(e.Data, ServerData != null? ServerData.Protocol : ServerData.ServerProtocol.R1Q2);
-			if (outcomingData.Id == _lastSentMessageId) return;
-			
-			_lastSentMessageId = outcomingData.Id;
+			var outcomingData = new RawData(e.Data);
+            int sequence = outcomingData.ReadInt();
+            int outId =  sequence & ~(1 << 31);
+
+            if (sequence == -1)
+            {
+                string cmd = outcomingData.ReadString(' ');
+                if (cmd == "connect")
+                    Protocol = (ServerData.ServerProtocol)int.Parse(outcomingData.ReadString(' '));
+                return;
+            }
+
+            if (outId <= _lastSentMessageId)
+                return;
+            int ack = outcomingData.ReadInt();
+
+            short qPort;
+            if (Protocol == ServerData.ServerProtocol.R1Q2)
+                qPort = outcomingData.ReadByte();
+            else
+                qPort = outcomingData.ReadShort();
+
+            _lastSentMessageId = outId;
 			
 			Package package = Package.ParseClientData(outcomingData);
 
@@ -82,15 +101,32 @@ namespace q2Tool
 				}
 			}
 
-			var finalPackage = new RawClientPackage(_lastSentMessageId, outcomingData.Ack, outcomingData.QPort, package, ServerData != null? ServerData.Protocol : Commands.Server.ServerData.ServerProtocol.R1Q2);
+            var finalPackage = new RawData(8 + (Protocol == ServerData.ServerProtocol.R1Q2 ? 1 : 2) + package.Size());
+            finalPackage.WriteInt(sequence);
+            finalPackage.WriteInt(ack);
+
+            if (Protocol == ServerData.ServerProtocol.R1Q2)
+                finalPackage.WriteByte((byte)qPort);
+            else
+                finalPackage.WriteShort(qPort);
+
+            package.WriteTo(finalPackage);
+
 			e.Data = finalPackage.Data;
 		}
 
 		void ParseServerData(IProxy sender, MessageEventArgs e)
 		{
-			RawServerPackage incomingData = new RawServerPackage(e.Data);
-			if (incomingData.Id == _lastReceivedMessageId) return;
-			_lastReceivedMessageId = incomingData.Id;
+            RawData incomingData = new RawData(e.Data);
+
+            int sequence = incomingData.ReadInt();
+            int inId = sequence & ~(1 << 31);
+
+            if (inId <= _lastReceivedMessageId || sequence == -1)
+                return;
+
+            _lastReceivedMessageId = inId;
+            int ack = incomingData.ReadInt();
 			
 			Package package = Package.ParseServerData(incomingData);
 
@@ -107,7 +143,6 @@ namespace q2Tool
 				switch (cmd.Type)
 				{
 					case ServerCommand.ServerData:
-						ServerData = (ServerData)cmd;
 						OnServerData.Fire(this, (ServerData)cmd);
 						break;
 
@@ -144,7 +179,11 @@ namespace q2Tool
 				}
 			}
 
-			var finalServerPackage = new RawServerPackage(_lastReceivedMessageId, incomingData.Ack, package);
+            var finalServerPackage = new RawData(8 + package.Size());
+            finalServerPackage.WriteInt(sequence);
+            finalServerPackage.WriteInt(ack);
+            package.WriteTo(finalServerPackage);
+
 			e.Data = finalServerPackage.Data;
 		}
 		#endregion

@@ -1,3 +1,4 @@
+using Jv.Networking;
 namespace q2Tool.Commands.Client
 {
 	public enum SettingType : short
@@ -15,7 +16,7 @@ namespace q2Tool.Commands.Client
 		public short Value { get; set; }
 
 		//[short setting, short value]
-		public Setting(RawPackage data)
+        public Setting(RawData data)
 		{
 			SubType = (SettingType)data.ReadShort();
 			Value = data.ReadShort();
@@ -35,7 +36,7 @@ namespace q2Tool.Commands.Client
 			return 5; // type + 2 bytes
 		}
 
-		public void WriteTo(RawPackage package)
+        public void WriteTo(RawData package)
 		{
 			package.WriteByte((byte)Type);
 			package.WriteShort((short)SubType);

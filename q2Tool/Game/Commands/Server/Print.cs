@@ -1,3 +1,4 @@
+using Jv.Networking;
 namespace q2Tool.Commands.Server
 {
 	public class Print : IServerCommand, IServerStringPackage
@@ -14,7 +15,7 @@ namespace q2Tool.Commands.Server
 		public PrintLevel Level { get; set; }
 
 		//[byte printLevel, string message]
-		public Print(RawPackage data)
+        public Print(RawData data)
 		{
 			Level = (PrintLevel)data.ReadByte();
 			Message = data.ReadString();
@@ -33,7 +34,7 @@ namespace q2Tool.Commands.Server
 			return Message.Length + 3;
 		}
 
-		public void WriteTo(RawPackage data)
+        public void WriteTo(RawData data)
 		{
 			if (string.IsNullOrEmpty(Message))
 				return;

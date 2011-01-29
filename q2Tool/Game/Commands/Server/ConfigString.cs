@@ -1,4 +1,6 @@
 using System;
+using Jv.Networking;
+
 namespace q2Tool.Commands.Server
 {
 	public enum ConfigStringType : short
@@ -52,7 +54,7 @@ namespace q2Tool.Commands.Server
 		public string Message { get; set; }
 
 		//[short configType][string message]
-		public ConfigString(ConfigStringType configType, int subCode, RawPackage data)
+		public ConfigString(ConfigStringType configType, int subCode, RawData data)
 		{
 			ConfigType = configType;
 			SubCode = subCode;
@@ -83,7 +85,7 @@ namespace q2Tool.Commands.Server
 			return Message.Length + 4;
 		}
 
-		public void WriteTo(RawPackage data)
+        public void WriteTo(RawData data)
 		{
 			if (_configType == ConfigStringType.Bad)
 				return;

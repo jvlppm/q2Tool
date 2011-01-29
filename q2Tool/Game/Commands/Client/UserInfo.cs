@@ -1,9 +1,10 @@
-﻿namespace q2Tool.Commands.Client
+﻿using Jv.Networking;
+namespace q2Tool.Commands.Client
 {
 	public class UserInfo : StringPackage, IClientStringPackage
 	{
 		//[string message]
-		public UserInfo(RawPackage data) : base((byte)ClientCommand.UserInfo, data) { }
+		public UserInfo(RawData data) : base((byte)ClientCommand.UserInfo, data) { }
 		public UserInfo(string message) : base((byte)ClientCommand.UserInfo, message) { }
 
 		public string this[string parameter]

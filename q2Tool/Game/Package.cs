@@ -3,6 +3,7 @@ using q2Tool.Commands;
 using q2Tool.Commands.Client;
 using q2Tool.Commands.Server;
 using System;
+using Jv.Networking;
 
 namespace q2Tool
 {
@@ -14,7 +15,7 @@ namespace q2Tool
 		public Queue<ICommand> Commands { get; private set; }
 		public byte[] RemainingData { get; private set; }
 
-		public static Package ParseClientData(RawClientPackage data)
+        public static Package ParseClientData(RawData data)
 		{
 			Package nPackage = new Package();
 			bool ignoreEndOfData = false;
@@ -51,7 +52,7 @@ namespace q2Tool
 			return nPackage;
 		}
 
-		public static Package ParseServerData(RawServerPackage data)
+        public static Package ParseServerData(RawData data)
 		{
 			Package nPackage = new Package();
 			bool ignoreEndOfData = false;
@@ -167,7 +168,7 @@ namespace q2Tool
 			return size;
 		}
 
-		public void WriteTo(RawPackage data)
+        public void WriteTo(RawData data)
 		{
 			foreach (ICommand cmd in Commands)
 			{

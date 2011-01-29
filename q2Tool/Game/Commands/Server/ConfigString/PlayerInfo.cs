@@ -1,8 +1,10 @@
-﻿namespace q2Tool.Commands.Server
+﻿using Jv.Networking;
+
+namespace q2Tool.Commands.Server
 {
 	public class PlayerInfo : ConfigString
 	{
-		public PlayerInfo(int playerId, RawServerPackage data) : base(ConfigStringType.PlayerInfo, playerId, data) { }
+		public PlayerInfo(int playerId, RawData data) : base(ConfigStringType.PlayerInfo, playerId, data) { }
 
 		public PlayerInfo(int playerId, string name, string model, string skin)
 			: base(ConfigStringType.PlayerInfo, playerId, string.Format("{0}\\{1}/{2}", name, model, skin)) { }
