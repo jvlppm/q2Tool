@@ -28,16 +28,16 @@ namespace q2Tool
 	public delegate void ServerCommandEventHandler<CommandType>(Quake sender, ServerCommandEventArgs<CommandType> e) where CommandType : class, IServerCommand;
 	public delegate void ClientCommandEventHandler<CommandType>(Quake sender, ClientCommandEventArgs<CommandType> e) where CommandType : class, IClientCommand;
 
-	public class ConnectionPackageEventArgs : EventArgs
+    public class ConnectionPackageEventArgs<CommandsType> : EventArgs where CommandsType : ICommand
 	{
-		public Package Package { get; private set; }
+        public Package<CommandsType> Package { get; private set; }
 
-		public ConnectionPackageEventArgs(Package package)
+        public ConnectionPackageEventArgs(Package<CommandsType> package)
 		{
 			Package = package;
 		}
 	}
-	public delegate void ConnectionPackageEventHandler(Quake sender, ConnectionPackageEventArgs e);
+    public delegate void ConnectionPackageEventHandler<CommandsType>(Quake sender, ConnectionPackageEventArgs<CommandsType> e) where CommandsType : ICommand;
 
 	public static class CommandEventExtensions
 	{
@@ -71,12 +71,12 @@ namespace q2Tool
 			catch { }
 		}
 
-		public static void Fire(this ConnectionPackageEventHandler eventHandler, Quake sender, Package package)
+        public static void Fire<CommandsType>(this ConnectionPackageEventHandler<CommandsType> eventHandler, Quake sender, Package<CommandsType> package) where CommandsType : ICommand
 		{
 			try
 			{
 				if (eventHandler != null)
-					eventHandler(sender, new ConnectionPackageEventArgs(package));
+					eventHandler(sender, new ConnectionPackageEventArgs<CommandsType>(package));
 			}
 			catch { }
 		}

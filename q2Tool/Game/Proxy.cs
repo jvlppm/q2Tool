@@ -26,7 +26,7 @@ namespace q2Tool
 
 		#region Events Definitions
 		#region Server
-		public event ConnectionPackageEventHandler OnServerPackage;
+		public event ConnectionPackageEventHandler<IServerCommand> OnServerPackage;
 		public event ServerCommandEventHandler<IServerStringPackage> OnServerStringPackage;
 		public event ServerCommandEventHandler<ServerData> OnServerData;
 		public event ServerCommandEventHandler<CenterPrint> OnServerCenterPrint;
@@ -36,7 +36,7 @@ namespace q2Tool
 		public event ServerCommandEventHandler<PlayerInfo> OnServerPlayerInfo;
 		#endregion
 		#region Client
-		public event ConnectionPackageEventHandler OnClientPackage;
+		public event ConnectionPackageEventHandler<IClientCommand> OnClientPackage;
 		public event ClientCommandEventHandler<IClientStringPackage> OnClientStringPackage;
 		public event ClientCommandEventHandler<StringCmd> OnClientStringCmd;
 		public event ClientCommandEventHandler<UserInfo> OnClientUserInfo;
@@ -72,8 +72,8 @@ namespace q2Tool
                 qPort = outcomingData.ReadShort();
 
             _lastSentMessageId = outId;
-			
-			Package package = Package.ParseClientData(outcomingData);
+
+            Package<IClientCommand> package = outcomingData.ReadClientPackage();
 
 			OnClientPackage.Fire(this, package);
 
@@ -127,8 +127,8 @@ namespace q2Tool
 
             _lastReceivedMessageId = inId;
             int ack = incomingData.ReadInt();
-			
-			Package package = Package.ParseServerData(incomingData);
+
+			Package<IServerCommand> package = incomingData.ReadServerPackage();
 
 			OnServerPackage.Fire(this, package);
 

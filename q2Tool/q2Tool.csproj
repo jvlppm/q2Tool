@@ -54,6 +54,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Client.cs" />
+    <Compile Include="Game\Commands\Client\Nop.cs" />
     <Compile Include="Game\Commands\Client\Setting.cs" />
     <Compile Include="Game\Commands\Client\StringCmd.cs" />
     <Compile Include="Game\Commands\Client\UserInfo.cs" />
@@ -62,7 +63,9 @@
     <Compile Include="Game\Commands\Server\CenterPrint.cs" />
     <Compile Include="Game\Commands\Server\ConfigString.cs" />
     <Compile Include="Game\Commands\Server\ConfigString\PlayerInfo.cs" />
+    <Compile Include="Game\Commands\Server\Disconnect.cs" />
     <Compile Include="Game\Commands\Server\Frame.cs" />
+    <Compile Include="Game\Commands\Server\Layout.cs" />
     <Compile Include="Game\Commands\Server\Print.cs" />
     <Compile Include="Game\Commands\Server\ServerData.cs" />
     <Compile Include="Game\Commands\Server\StuffText.cs" />
@@ -73,6 +76,7 @@
     <Compile Include="Game\Package.cs" />
     <Compile Include="Game\Proxy.cs" />
     <Compile Include="Game\Quake.cs" />
+    <Compile Include="Game\RawDataExtensions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Plugin.cs" />
@@ -151,6 +155,9 @@
     <Reference Include="System" />
     <Reference Include="System.XML" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="zlib.net">
+      <HintPath>..\References\zlib.net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -7,13 +7,51 @@ using Jv.Networking;
 
 namespace q2Tool
 {
-	public class Package : ICommand
+    public class Package<CommandsType> : ICommand where CommandsType : ICommand
+    {
+        public Queue<CommandsType> Commands { get; private set; }
+        public List<byte> RemainingData { get; set; }
+
+        public Package()
+        {
+            Commands = new Queue<CommandsType>();
+            RemainingData = new List<byte>();
+        }
+
+        public void Clear()
+        {
+            Commands.Clear();
+            RemainingData.Clear();
+        }
+
+        #region ICommand
+        public int Size()
+        {
+            int size = 0;
+
+            foreach (ICommand cmd in Commands)
+                size += cmd.Size();
+
+            return size + RemainingData.Count;
+        }
+
+        public void WriteTo(RawData data)
+        {
+            foreach (ICommand cmd in Commands)
+                cmd.WriteTo(data);
+
+            if (RemainingData.Count != 0)
+                data.WriteBytes(RemainingData.ToArray());
+        }
+        #endregion
+    }
+	/*public class Package : ICommand
 	{
 		//const int ServerCmdBits = 5;
 		//const int ServerCmdMask = ((1 << ServerCmdBits) - 1);
 
 		public Queue<ICommand> Commands { get; private set; }
-		public byte[] RemainingData { get; private set; }
+		public List<byte> RemainingData { get; private set; }
 
         public static Package ParseClientData(RawData data)
 		{
@@ -44,9 +82,9 @@ namespace q2Tool
 
 			if (!data.EndOfData)
 			{
-				nPackage.RemainingData = new byte[data.Data.Length - data.CurrentPosition];
+				nPackage.RemainingData = new List<byte>();
 				for (int i = 0; !data.EndOfData; i++)
-					nPackage.RemainingData[i] = data.ReadByte();
+					nPackage.RemainingData.Add(data.ReadByte());
 			}
 
 			return nPackage;
@@ -70,9 +108,9 @@ namespace q2Tool
 						nPackage.Commands.Enqueue(new ServerData(data));
 						break;
 
-					/*case ServerCommand.Frame:
-						nPackage.Commands.Add(new Frame(data, extrabits));
-						break;*/
+					//case ServerCommand.Frame:
+					//	nPackage.Commands.Add(new Frame(data, extrabits));
+					//	break;
 
 					case ServerCommand.Print:
 						nPackage.Commands.Enqueue(new Print(data));
@@ -81,6 +119,17 @@ namespace q2Tool
 					case ServerCommand.CenterPrint:
 						nPackage.Commands.Enqueue(new CenterPrint(data));
 						break;
+
+                    case ServerCommand.ZPacket:
+                        var compressedLength = data.ReadShort();
+                        var uncompressedLength = data.ReadShort();
+                        var compressedPackage = ParseServerData(new RawData(data.ReadZPacket(compressedLength, uncompressedLength)));
+
+                        foreach (var zPackage in compressedPackage.Commands)
+                            nPackage.Commands.Enqueue(zPackage);
+
+                        nPackage.RemainingData.AddRange(compressedPackage.RemainingData);
+                        break;
 
 					case ServerCommand.StuffText:
 						nPackage.Commands.Enqueue(new StuffText(data));
@@ -141,9 +190,9 @@ namespace q2Tool
 
 			if (!data.EndOfData)
 			{
-				nPackage.RemainingData = new byte[data.Data.Length - data.CurrentPosition];
+				nPackage.RemainingData = new List<byte>();
 				for (int i = 0; !data.EndOfData; i++)
-					nPackage.RemainingData[i] = data.ReadByte();
+					nPackage.RemainingData.Add(data.ReadByte());
 			}
 
 			return nPackage;
@@ -163,7 +212,7 @@ namespace q2Tool
 				size += cmd.Size();
 
 			if(RemainingData != null)
-				size += RemainingData.Length;
+				size += RemainingData.Count;
 
 			return size;
 		}
@@ -176,10 +225,10 @@ namespace q2Tool
 			}
 
 			if (RemainingData != null)
-				data.WriteBytes(RemainingData);
+				data.WriteBytes(RemainingData.ToArray());
 		}
 
 		public ServerCommand Type { get { return ServerCommand.Bad; } }
 		#endregion
-	}
+	}*/
 }
