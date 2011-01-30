@@ -9,11 +9,6 @@ namespace q2Tool
 {
 	public static class RawDataExtensions
 	{
-		public static char ReadChar(this RawData data)
-		{
-			return (char)data.ReadByte();
-		}
-
 		public static string ReadQuotedString(this RawData data)
 		{
 			if (data.ReadChar() != '\"')

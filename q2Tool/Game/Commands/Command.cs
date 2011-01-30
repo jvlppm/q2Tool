@@ -46,7 +46,5 @@
 		PlayerUpdate = 0x17,
 		Setting = 0x18,
 		// ********** end r1q2 specific *******
-
-		MaxEntityTypes = 0x19
 	}
 }
