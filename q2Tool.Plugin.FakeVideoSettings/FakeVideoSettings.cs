@@ -24,7 +24,7 @@ namespace q2Tool
 			Quake.OnServerStuffText += OnStuffText;
 		}
 
-		void OnStuffText(Quake sender, ServerCommandEventArgs<Commands.Server.StuffText> e)
+		void OnStuffText(Quake sender, CommandEventArgs<Commands.Server.StuffText> e)
 		{
 			foreach (string var in _values.Keys)
 				e.Command.Message = e.Command.Message.Replace(var, _values[var]);

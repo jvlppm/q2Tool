@@ -14,7 +14,7 @@ namespace q2Tool
 			Quake.OnServerCenterPrint += QuakeOnCenterPrint;
 		}
 
-		static void QuakeOnServerData(Quake sender, ServerCommandEventArgs<ServerData> e)
+		static void QuakeOnServerData(Quake sender, CommandEventArgs<ServerData> e)
 		{
 			lock (SyncLines)
 			{
@@ -23,7 +23,7 @@ namespace q2Tool
 			}
 		}
 
-		static void QuakeOnCenterPrint(Quake sender, ServerCommandEventArgs<CenterPrint> e)
+		static void QuakeOnCenterPrint(Quake sender, CommandEventArgs<CenterPrint> e)
 		{
 			ConsoleColor messageColor;
 			switch (e.Command.Message)
@@ -46,7 +46,7 @@ namespace q2Tool
 				ShowCentralizedLine(messageColor, e.Command.Message);
 		}
 
-		static void QuakeOnPrint(Quake sender, ServerCommandEventArgs<Print> e)
+		static void QuakeOnPrint(Quake sender, CommandEventArgs<Print> e)
 		{
 			if (e.Command.Level == Print.PrintLevel.Chat)
 			{

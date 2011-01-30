@@ -13,7 +13,7 @@ namespace q2Tool
 			Quake.OnClientUserInfo += Quake_OnUserInfo;
 		}
 
-		void Quake_OnUserInfo(Quake sender, ClientCommandEventArgs<Commands.Client.UserInfo> e)
+		void Quake_OnUserInfo(Quake sender, CommandEventArgs<Commands.Client.UserInfo> e)
 		{
 			if (_ignore)
 			{

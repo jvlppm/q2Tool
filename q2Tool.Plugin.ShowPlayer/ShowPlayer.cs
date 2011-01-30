@@ -56,13 +56,13 @@ namespace q2Tool
 			}
 		}
 
-		void Quake_OnPlayerInfo(Quake sender, ServerCommandEventArgs<PlayerInfo> e)
+		void Quake_OnPlayerInfo(Quake sender, CommandEventArgs<PlayerInfo> e)
 		{
 			if (_skins.ContainsKey(e.Command.Name))
 				e.Command.Skin = _skins[e.Command.Name];
 		}
 
-		void Quake_OnStringCmd(Quake sender, ClientCommandEventArgs<StringCmd> e)
+		void Quake_OnStringCmd(Quake sender, CommandEventArgs<StringCmd> e)
 		{
 			if (e.Command.Message.StartsWith("show"))
 			{

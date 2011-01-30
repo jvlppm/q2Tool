@@ -9,12 +9,12 @@ namespace q2Tool
 	{
 		protected override void OnGameStart()
 		{
-			Quake.OnClientSetting += new ClientCommandEventHandler<Commands.Client.Setting>(Quake_OnClientSetting);
+			Quake.OnServerStuffText += Quake_OnServerStuffText;
 		}
 
-		void Quake_OnClientSetting(Quake sender, ClientCommandEventArgs<Commands.Client.Setting> e)
+		void Quake_OnServerStuffText(Quake sender, CommandEventArgs<StuffText> e)
 		{
-			Console.WriteLine("Setting: {0} = {1}", e.Command.SubType, e.Command.Value);
+			e.Command.Message = e.Command.Message.Replace("allow_download 1", "allow_download 0");
 		}
 	}
 }

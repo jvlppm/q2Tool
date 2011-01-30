@@ -78,9 +78,9 @@ namespace q2Tool
 						text += "[DEAD] ";
 					text += "<b>" + evnt.Player.Name.Replace("<", "&lt;").Replace(">", "&gt;") + "</b>: " + HighlightNames(FindEmoticons(evnt.Message)).Replace("\\", "\\\\") + "\n";
 				}
-				else if (eventArgs is ServerCommandEventArgs<CenterPrint>)
+				else if (eventArgs is CommandEventArgs<CenterPrint>)
 				{
-					var evnt = (ServerCommandEventArgs<CenterPrint>)eventArgs;
+					var evnt = (CommandEventArgs<CenterPrint>)eventArgs;
 					bold = true;
 					text = evnt.Command.Message.Replace("<", "&lt;").Replace(">", "&gt;").TrimEnd('\n', '\r') + "\n";
 				}

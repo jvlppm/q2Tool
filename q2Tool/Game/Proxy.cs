@@ -26,23 +26,23 @@ namespace q2Tool
 
 		#region Events Definitions
 		#region Server
-		public event ConnectionPackageEventHandler<IServerCommand> OnServerPackage;
-		public event ServerCommandEventHandler<IServerStringPackage> OnServerStringPackage;
-		public event ServerCommandEventHandler<ServerData> OnServerData;
-		public event ServerCommandEventHandler<CenterPrint> OnServerCenterPrint;
-		public event ServerCommandEventHandler<Print> OnServerPrint;
-		public event ServerCommandEventHandler<StuffText> OnServerStuffText;
-		public event ServerCommandEventHandler<ConfigString> OnServerConfigString;
-		public event ServerCommandEventHandler<PlayerInfo> OnServerPlayerInfo;
-		public event ServerCommandEventHandler<Layout> OnServerLayout;
-		public event ServerCommandEventHandler<Disconnect> OnServerDisconnect;
+		public event CommandEventHandler<Package<IServerCommand>> OnServerPackage;
+		public event CommandEventHandler<IServerStringPackage> OnServerStringPackage;
+		public event CommandEventHandler<ServerData> OnServerData;
+		public event CommandEventHandler<CenterPrint> OnServerCenterPrint;
+		public event CommandEventHandler<Print> OnServerPrint;
+		public event CommandEventHandler<StuffText> OnServerStuffText;
+		public event CommandEventHandler<ConfigString> OnServerConfigString;
+		public event CommandEventHandler<PlayerInfo> OnServerPlayerInfo;
+		public event CommandEventHandler<Layout> OnServerLayout;
+		public event CommandEventHandler<Disconnect> OnServerDisconnect;
 		#endregion
 		#region Client
-		public event ConnectionPackageEventHandler<IClientCommand> OnClientPackage;
-		public event ClientCommandEventHandler<IClientStringPackage> OnClientStringPackage;
-		public event ClientCommandEventHandler<StringCmd> OnClientStringCmd;
-		public event ClientCommandEventHandler<UserInfo> OnClientUserInfo;
-		public event ClientCommandEventHandler<Setting> OnClientSetting;
+		public event CommandEventHandler<Package<IClientCommand>> OnClientPackage;
+		public event CommandEventHandler<IClientStringPackage> OnClientStringPackage;
+		public event CommandEventHandler<StringCmd> OnClientStringCmd;
+		public event CommandEventHandler<UserInfo> OnClientUserInfo;
+		public event CommandEventHandler<Setting> OnClientSetting;
 		#endregion
 		#endregion
 
@@ -76,34 +76,44 @@ namespace q2Tool
             _lastSentMessageId = outId;
 
             Package<IClientCommand> package = outcomingData.ReadClientPackage();
+			Package<IClientCommand> okPackage = new Package<IClientCommand>();
 
-			OnClientPackage.Fire(this, package);
-
-			lock(_fakeClientCommands)
+			lock (_fakeClientCommands)
 			{
 				while (_fakeClientCommands.Count > 0)
-					package.Commands.Enqueue(_fakeClientCommands.Dequeue());
+					okPackage.Commands.Enqueue(_fakeClientCommands.Dequeue());
 			}
 
-			foreach(IClientCommand cmd in package.Commands)
+			if (OnClientPackage.Check(this, package))
 			{
-				switch(cmd.Type)
+				foreach (IClientCommand cmd in package.Commands)
 				{
-					case ClientCommand.StringCmd:
-						OnClientStringCmd.Fire(this, (StringCmd)cmd);
-						OnClientStringPackage.Fire(this, (IClientStringPackage) cmd);
-						break;
-					case ClientCommand.UserInfo:
-						OnClientUserInfo.Fire(this, (UserInfo)cmd);
-						OnClientStringPackage.Fire(this, (IClientStringPackage)cmd);
-						break;
-					case ClientCommand.Setting:
-						OnClientSetting.Fire(this, (Setting)cmd);
-						break;
+					switch (cmd.Type)
+					{
+						case ClientCommand.StringCmd:
+							if (OnClientStringCmd.Check(this, (StringCmd)cmd) &&
+								OnClientStringPackage.Check(this, (IClientStringPackage)cmd))
+								okPackage.Commands.Enqueue(cmd);
+							break;
+						case ClientCommand.UserInfo:
+							if (OnClientUserInfo.Check(this, (UserInfo)cmd) &&
+								OnClientStringPackage.Check(this, (IClientStringPackage)cmd))
+								okPackage.Commands.Enqueue(cmd);
+							break;
+						case ClientCommand.Setting:
+							if (OnClientSetting.Check(this, (Setting)cmd))
+								okPackage.Commands.Enqueue(cmd);
+							break;
+						default:
+							okPackage.Commands.Enqueue(cmd);
+							break;
+					}
 				}
 			}
 
-            var finalPackage = new RawData(8 + (Protocol == ServerData.ServerProtocol.R1Q2 ? 1 : 2) + package.Size());
+			okPackage.RemainingData = package.RemainingData;
+
+			var finalPackage = new RawData(8 + (Protocol == ServerData.ServerProtocol.R1Q2 ? 1 : 2) + okPackage.Size());
             finalPackage.WriteInt(sequence);
             finalPackage.WriteInt(ack);
 
@@ -112,7 +122,7 @@ namespace q2Tool
             else
                 finalPackage.WriteShort(qPort);
 
-            package.WriteTo(finalPackage);
+			okPackage.WriteTo(finalPackage);
 
 			e.Data = finalPackage.Data;
 		}
@@ -131,68 +141,81 @@ namespace q2Tool
             int ack = incomingData.ReadInt();
 
 			Package<IServerCommand> package = incomingData.ReadServerPackage();
-
-			OnServerPackage.Fire(this, package);
+			Package<IServerCommand> okPackage = new Package<IServerCommand>();
 
 			lock (_fakeServerCommands)
 			{
 				while (_fakeServerCommands.Count > 0)
-					package.Commands.Enqueue(_fakeServerCommands.Dequeue());
+					okPackage.Commands.Enqueue(_fakeServerCommands.Dequeue());
 			}
 
-			foreach (IServerCommand cmd in package.Commands)
+			if (OnServerPackage.Check(this, package))
 			{
-				switch (cmd.Type)
+				foreach (IServerCommand cmd in package.Commands)
 				{
-					case ServerCommand.Disconnect:
-						OnServerDisconnect.Fire(this, (Disconnect)cmd);
-						break;
+					switch (cmd.Type)
+					{
+						case ServerCommand.Disconnect:
+							_lastReceivedMessageId = 0;
+							_lastSentMessageId = 0;
+							if (OnServerDisconnect.Check(this, (Disconnect)cmd))
+								okPackage.Commands.Enqueue(cmd);
+							break;
 
-					case ServerCommand.Layout:
-						OnServerLayout.Fire(this, (Layout)cmd);
-						break;
+						case ServerCommand.Layout:
+							if(OnServerLayout.Check(this, (Layout)cmd))
+								okPackage.Commands.Enqueue(cmd);
+							break;
 
-					case ServerCommand.ServerData:
-						OnServerData.Fire(this, (ServerData)cmd);
-						break;
+						case ServerCommand.ServerData:
+							if(OnServerData.Check(this, (ServerData)cmd))
+								okPackage.Commands.Enqueue(cmd);
+							break;
 
-					case ServerCommand.CenterPrint:
-						OnServerCenterPrint.Fire(this, (CenterPrint)cmd);
-						OnServerStringPackage.Fire(this, (IServerStringPackage)cmd);
-						break;
+						case ServerCommand.CenterPrint:
+							if(OnServerCenterPrint.Check(this, (CenterPrint)cmd) &&
+								OnServerStringPackage.Check(this, (IServerStringPackage)cmd))
+								okPackage.Commands.Enqueue(cmd);
+							break;
 
-					case ServerCommand.Print:
-						OnServerPrint.Fire(this, (Print)cmd);
-						OnServerStringPackage.Fire(this, (IServerStringPackage)cmd);
-						break;
+						case ServerCommand.Print:
+							if(OnServerPrint.Check(this, (Print)cmd) &&
+								OnServerStringPackage.Check(this, (IServerStringPackage)cmd))
+								okPackage.Commands.Enqueue(cmd);
+							break;
 
-					case ServerCommand.StuffText:
-						OnServerStuffText.Fire(this, (StuffText)cmd);
-						OnServerStringPackage.Fire(this, (IServerStringPackage)cmd);
-						break;
+						case ServerCommand.StuffText:
+							if(OnServerStuffText.Check(this, (StuffText)cmd) &&
+								OnServerStringPackage.Check(this, (IServerStringPackage)cmd))
+								okPackage.Commands.Enqueue(cmd);
+							break;
 
-					case ServerCommand.ConfigString:
-						switch (((ConfigString)cmd).ConfigType)
-						{
-							case ConfigStringType.PlayerInfo:
-								OnServerPlayerInfo.Fire(this, (PlayerInfo)cmd);
-								OnServerConfigString.Fire(this, (PlayerInfo)cmd);
-								OnServerStringPackage.Fire(this, (PlayerInfo)cmd);
-								break;
+						case ServerCommand.ConfigString:
+							switch (((ConfigString)cmd).ConfigType)
+							{
+								case ConfigStringType.PlayerInfo:
+									if(OnServerPlayerInfo.Check(this, (PlayerInfo)cmd) &&
+										OnServerConfigString.Check(this, (PlayerInfo)cmd) &&
+										OnServerStringPackage.Check(this, (PlayerInfo)cmd))
+										okPackage.Commands.Enqueue(cmd);
+									break;
 
-							default:
-								OnServerConfigString.Fire(this, (ConfigString)cmd);
-								OnServerStringPackage.Fire(this, (ConfigString)cmd);
-								break;
-						}
-						break;
+								default:
+									if(OnServerConfigString.Check(this, (ConfigString)cmd) &&
+										OnServerStringPackage.Check(this, (ConfigString)cmd))
+										okPackage.Commands.Enqueue(cmd);
+									break;
+							}
+							break;
+					}
 				}
 			}
+			okPackage.RemainingData = package.RemainingData;
 
-            var finalServerPackage = new RawData(8 + package.Size());
+			var finalServerPackage = new RawData(8 + okPackage.Size());
             finalServerPackage.WriteInt(sequence);
             finalServerPackage.WriteInt(ack);
-            package.WriteTo(finalServerPackage);
+			okPackage.WriteTo(finalServerPackage);
 
 			e.Data = finalServerPackage.Data;
 		}

@@ -87,7 +87,7 @@ namespace q2Tool
 			Quake.OnServerPrint += Quake_Connected;
 		}
 
-		void Quake_Connected(Quake sender, ServerCommandEventArgs<Print> e)
+		void Quake_Connected(Quake sender, CommandEventArgs<Print> e)
 		{
 			if (OnConnectedToServer != null)
 			{
@@ -96,7 +96,7 @@ namespace q2Tool
 			}
 		}
 
-		void Quake_OnServerData(Quake sender, ServerCommandEventArgs<ServerData> e)
+		void Quake_OnServerData(Quake sender, CommandEventArgs<ServerData> e)
 		{
 			_playerNum = e.Command.PlayerNum;
 		}
@@ -123,7 +123,7 @@ namespace q2Tool
 			}
 		}
 
-		void AddPlayer(int id, string name, ServerCommandEventArgs<PlayerInfo> e)
+		void AddPlayer(int id, string name, CommandEventArgs<PlayerInfo> e)
 		{
 			if (!PlayersById.ContainsKey(id))
 			{
@@ -139,7 +139,7 @@ namespace q2Tool
 			}
 		}
 
-		void Quake_OnServerCenterPrint(Quake sender, ServerCommandEventArgs<CenterPrint> e)
+		void Quake_OnServerCenterPrint(Quake sender, CommandEventArgs<CenterPrint> e)
 		{
 			if (e.Command.Message == "LIGHTS...\n")
 			{
@@ -149,7 +149,7 @@ namespace q2Tool
 			}
 		}
 
-		void Quake_OnServerPrint(Quake sender, ServerCommandEventArgs<Print> e)
+		void Quake_OnServerPrint(Quake sender, CommandEventArgs<Print> e)
 		{
 			string message = e.Command.Message;
 

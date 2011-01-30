@@ -13,7 +13,7 @@ namespace q2Tool
 			Quake.OnClientStringCmd += Quake_OnClientStringCmd;
 		}
 
-		void Quake_OnClientStringCmd(Quake sender, ClientCommandEventArgs<Commands.Client.StringCmd> e)
+		void Quake_OnClientStringCmd(Quake sender, CommandEventArgs<Commands.Client.StringCmd> e)
 		{
 			e.Command.Message = e.Command.Message.Replace(_localIp, _serverIp);
 		}
